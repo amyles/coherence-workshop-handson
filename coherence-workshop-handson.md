@@ -104,7 +104,7 @@ $ cd coherence-demo/
 Review the manifest for the primary cluster:
 
 ```
-$ less yaml/primary-cluster.yaml
+$ less ~/coherence-demo/yaml/primary-cluster.yaml
 ```
 
 The manifest defines two Coherence clusters, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will tale care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file.
@@ -127,7 +127,7 @@ image: lhr.ocir.io/oscemea001/coherence/coherence-demo:4.0.0-SNAPSHOT
 Deploy the primary Coherence cluster to the London OKE cluster:
 
 ```
-$ kubectl apply -f yaml/primary-cluster.yaml
+$ kubectl apply -f ~/coherence-demo/yaml/primary-cluster.yaml
 ```
 
 To check the state of the Coherence cluster issue the command:
@@ -219,4 +219,60 @@ Once the new node is added stop the command with ^c. Check  you have three nodes
 ```
 kubectl get nodes
 ```
+
+## Scale the Coherence Cluster
+
+Now that we've added more compute capacity to the Kubernetes cluster we will scale our Coherence cluster. 
+
+First check how the existing two pods of the storage cluster are distributed across the OKE worker nodes:
+
+```
+$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
+```
+
+This will show that the two pods are running on different worker nodes, the Coherence operator enforces anti-affinity. 
+
+Now increase the replica count of the coherence storage cluster from 2 to 3. There are many ways to do this but we will edit the manifest file and reapply it. Open the primary-cluster.yaml in vi :
+
+```
+$ vi ~/coherence-demo/yaml/primary-cluster.yaml
+```
+
+Use the arrow keys to move the cursor to the replica field value of the primary-cluster-storage-resource:
+
+```yaml
+coherence:
+    cacheConfig: cache-config.xml
+    metrics:
+      enabled: true
+      port: 9612
+  image: lhr.ocir.io/oscemea001/coherence/coherence-demo:4.0.0-SNAPSHOT
+  imagePullPolicy: Always
+  replicas: 2
+---
+```
+
+With the 2 selected press the r key and then the 3 key to replace the value. Press escape then wq to write and quit vi. 
+
+Now apply the manifests again:
+
+```
+$ kubectl apply -f ~/coherence-demo/yaml/primary-cluster.yaml -n coherence-demo-ns
+```
+
+Immediately check for the new node being added:
+
+```
+$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
+```
+
+You should see the new pod being added and transitioning to the Running state. Note the the pod is running a the new node. The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes will be distributed across fault domains within each region to provide additional levels of redundancy. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
+
+```
+$ kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oraclecloud.com/fault-domain
+```
+
+This will print the availability domain and fault domain of each worker node.
+
+
 
