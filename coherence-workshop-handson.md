@@ -139,7 +139,7 @@ primary-cluster-http      primary-cluster   http      2          2       Ready
 primary-cluster-storage   primary-cluster   storage   2          2       Ready
 ```
 
-The basic kubernetes resources created by the operator can be seen with the following command which will list the pods, services, deployments, replicasets and statefulsets in the coherence-demo-ns namespace:
+The basic kubernetes resources created by the Coherence operator can be seen with the following command which will list the pods, services, deployments, replicasets and statefulsets in the coherence-demo-ns namespace:
 
 ```
 $ kubectl get all -n coherence-demo-ns
@@ -172,5 +172,51 @@ replicaset.apps/coherence-operator-845c87bd5f   1         1         1       5d1h
 NAME                                       READY   AGE
 statefulset.apps/primary-cluster-http      2/2     20h
 statefulset.apps/primary-cluster-storage   3/3     20h
+```
+
+## Connect to the Demo App on the London OKE Cluster
+
+The user interface of the Coherence Demo app is exposed as a NodePort service in Kubernetes, i.e. a port is exposed on the public IP address of every kubernetes worker node. Note that in a production scenario other choices are available for exposing the UI that might be more suitable! 
+
+List the public IP addresses of the worker nodes:
+
+```
+$ kubectl get nodes -owide
+```
+
+The output will list the addresses under EXTERNAL-IP column, copy any one and enter the URL http://<EXTERNAL-IP>:32636/application/index.html. This will open the UI:
+
+![image-20200929152901818](image-20200929152901818.png)
+
+## Scale the OKE Cluster
+
+The OKE cluster has been provisioned with two worker nodes, we will add a third worker node by scaling the cluster's only node pool. We will then scale our Coherence cluster to use the new compute capacity. 
+
+Ensure you are still logged in to the OCI Console and on the London cluster's homepage. If not access the hamburger in the top left hand corner then select Developer Services then select Kubernetes Clusters and pick your assigned cluster form the list. In the resources menu on the left select Node Pools
+
+ ![Screenshot from 2020-09-29 16-16-16](Screenshot%20from%202020-09-29%2016-16-16.png)
+
+On the subsequently displayed node pool click on pool1 to see the pool details.
+
+![Screenshot from 2020-09-29 16-22-47](Screenshot%20from%202020-09-29%2016-22-47.png)
+
+Click scale to change the number of worker nodes from 2 to 3. This will cause a new virtual machine to be provisioned, the kubernetes software to be installed and joined to the OKE cluster. 
+
+![image-20200929162615227](image-20200929162615227.png)
+
+Change number of nodes to 3 and press the blue Scale button. 
+
+Back in the Cloud Shell issue the following command to see the new node being added:
+
+```
+kubectl get nodes -w
+```
+
+The -w flag will cause the command to wait until the new node is added. This usually takes a few moments so this is a good point to have a tea break! 
+
+Once the new node is added stop the command with ^c. Check  you have three nodes in the ready state with:
+
+```
+kubectl get nodes
 ```
 
