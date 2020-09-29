@@ -26,7 +26,7 @@ On the OKE clusters homepage locate the cluster assigned to you. Ensure you are 
 
 ![image-20200929090516869](image-20200929090516869.png)
 
-Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config. You should now be able to query your OKE cluster by running 
+Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config. You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
 
 ```bash
 kubectl get nodes -o wide
@@ -51,5 +51,45 @@ $ kubectl config rename-context context-cqtsyzvge2w lhr
 Context "context-cqtsyzvge2w" renamed to "lhr".
 ```
 
-Prepare the London Cluster for Coherence
+## Prepare the London Cluster for Coherence
+
+We will create a new Kubernetes namespace and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our London cluster. 
+
+Create  new namespace to isolate the resources that are part of our lab, in the cloud shell terminal issue the command:
+
+```
+$ kubectl create namespace coherence-demo-ns
+```
+
+Then add the Coherence Operator helm chart repo to the local, pre-installed helm utility. 
+
+```
+$ helm repo add coherence https://oracle.github.io/coherence-operator/charts
+```
+
+Then update the local repos:
+
+```
+helm repo update
+```
+
+Install the operator into our London cluster:
+
+```
+helm install coherence-operator --namespace coherence-demo-ns coherence/coherence-operator
+```
+
+Check that the operator pod is running:
+
+```
+kubectl get pods --namespace coherence-demo-ns
+```
+
+The pod should show as being in the Running state. The operator is now ready to intercept the creation of new, custom coherence cluster resources being sent to the Kubernetes API. 
+
+## Deploy the primary Coherence cluster 
+
+We will deploy the first Coherence cluster in the London OKE cluster. A pre-built manifest file defines all the resources needed to run a Coherence cluster for object storage and another, storage-disabled Coherence cluster for the user interface. The manifests are stored in a git rep that can be cloned in Cloud Shell:
+
+
 
