@@ -89,7 +89,88 @@ The pod should show as being in the Running state. The operator is now ready to 
 
 ## Deploy the primary Coherence cluster 
 
-We will deploy the first Coherence cluster in the London OKE cluster. A pre-built manifest file defines all the resources needed to run a Coherence cluster for object storage and another, storage-disabled Coherence cluster for the user interface. The manifests are stored in a git rep that can be cloned in Cloud Shell:
+We will deploy the first Coherence cluster in the London OKE cluster. A pre-built manifest file defines all the resources needed to run a Coherence cluster for object storage and another, storage-disabled Coherence cluster for the user interface. The manifests are stored in a git repo that can be cloned in Cloud Shell and then deployed. Clone the repo:
 
+```
+$ git clone https://gitlab.osc-cloud.com/coherence-workshop/coherence-demo.git
+```
 
+The contents of the repo will be copied to your Cloud Shell environment. Once complete change into the new directory:
+
+```
+$ cd coherence-demo/
+```
+
+Review the manifest for the primary cluster:
+
+```
+$ less yaml/primary-cluster.yaml
+```
+
+The manifest defines two Coherence clusters, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will tale care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file.
+
+```yaml
+apiVersion: coherence.oracle.com/v1
+kind: Coherence
+metadata:
+  name: primary-cluster-storage
+```
+
+The manifest also contains details of the container image used as well as the number of replicas used:
+
+```yaml
+image: lhr.ocir.io/oscemea001/coherence/coherence-demo:4.0.0-SNAPSHOT
+  imagePullPolicy: Always
+  replicas: 3
+```
+
+Deploy the primary Coherence cluster to the London OKE cluster:
+
+```
+$ kubectl apply -f yaml/primary-cluster.yaml
+```
+
+To check the state of the Coherence cluster issue the command:
+
+```
+$ kubectl get coherence -n coherence-demo-ns
+NAME                      CLUSTER           ROLE      REPLICAS   READY   PHASE
+primary-cluster-http      primary-cluster   http      2          2       Ready
+primary-cluster-storage   primary-cluster   storage   2          2       Ready
+```
+
+The basic kubernetes resources created by the operator can be seen with the following command which will list the pods, services, deployments, replicasets and statefulsets in the coherence-demo-ns namespace:
+
+```
+$ kubectl get all -n coherence-demo-ns
+NAME                                      READY   STATUS    RESTARTS   AGE
+pod/coherence-operator-845c87bd5f-766px   1/1     Running   0          18h
+pod/primary-cluster-http-0                1/1     Running   0          4h46m
+pod/primary-cluster-http-1                1/1     Running   1          20h
+pod/primary-cluster-storage-0             1/1     Running   0          4h46m
+pod/primary-cluster-storage-1             1/1     Running   2          20h
+pod/primary-cluster-storage-2             1/1     Running   0          4h46m
+
+NAME                                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+service/coherence-operator-metrics           ClusterIP   10.96.220.115   <none>        8383/TCP,8686/TCP   5d1h
+service/primary-cluster-http-http            NodePort    10.96.112.56    <none>        8080:32636/TCP      20h
+service/primary-cluster-http-metrics         ClusterIP   10.96.171.136   <none>        9612/TCP            20h
+service/primary-cluster-http-sts             ClusterIP   None            <none>        7/TCP               20h
+service/primary-cluster-http-wka             ClusterIP   None            <none>        7/TCP               20h
+service/primary-cluster-storage-federation   ClusterIP   10.96.107.5     <none>        40000/TCP           20h
+service/primary-cluster-storage-metrics      ClusterIP   10.96.80.100    <none>        9612/TCP            20h
+service/primary-cluster-storage-np           NodePort    10.96.149.115   <none>        40000:31602/TCP     4d19h
+service/primary-cluster-storage-sts          ClusterIP   None            <none>        7/TCP               20h
+service/primary-cluster-storage-wka          ClusterIP   None            <none>        7/TCP               20h
+
+NAME                                 READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/coherence-operator   1/1     1            1           5d1h
+
+NAME                                            DESIRED   CURRENT   READY   AGE
+replicaset.apps/coherence-operator-845c87bd5f   1         1         1       5d1h
+
+NAME                                       READY   AGE
+statefulset.apps/primary-cluster-http      2/2     20h
+statefulset.apps/primary-cluster-storage   3/3     20h
+```
 
