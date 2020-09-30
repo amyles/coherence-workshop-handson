@@ -266,7 +266,13 @@ Immediately check for the new node being added:
 $ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
-You should see the new pod being added and transitioning to the Running state. Note the the pod is running a the new node. The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes will be distributed across fault domains within each region to provide additional levels of redundancy. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
+You should see the new pod being added and transitioning to the Running state. Note the the pod is running on the new worker node.
+
+In the application UI note that a new Coherence server is shown. The cache data will have been re-partitioned across all three servers:
+
+![image-20200929173052997](image-20200929173052997.png) 
+
+The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes will be distributed across fault domains within each region to provide additional levels of redundancy. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
 
 ```
 $ kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oraclecloud.com/fault-domain
@@ -274,5 +280,51 @@ $ kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oracle
 
 This will print the availability domain and fault domain of each worker node.
 
+## Recovery from Pod Failure
 
+We will now simulate a failure of a pod and observe Kubernetes automatic recovery. A pod in Kubernetes is the smallest depoyable unit and consists of one or more running containers. In our example the pods are managed by Kubernetes statefulsets which control an ordered set of pods each with a stable network identity, ideal for applications like Coherence. The Kubernetes controller maintains the number of pods in the statefulset at the number specified when deployed, the "desired state".
+
+In the Cloud Shell list the pods that constitute the storage cluster:
+
+```
+$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
+NAME                        READY   STATUS    RESTARTS   AGE     IP             NODE        NOMINATED NODE   READINESS GATES
+primary-cluster-storage-0   1/1     Running   1          16h     10.244.0.168   10.0.10.2   <none>           <none>
+primary-cluster-storage-1   1/1     Running   0          2m59s   10.244.1.40    10.0.10.4   <none>           <none>
+primary-cluster-storage-2   1/1     Running   1          15h     10.244.0.3     10.0.10.6   <none>           <none>
+```
+
+This shows that each pod is named "primary-cluster-storage-" followed by an ordinal, e.g. primary-cluster-storage-0. We will delete one of these pods. You will also be able to view the recovery from the demo applications UI so try and arrange your browser windows to show the UI alongside the Cloud Shell. To delete the pod issue the command:
+
+```
+$ kubectl delete po primary-cluster-storage-0 -n coherence-demo-ns
+```
+
+Immediately once this completes issue the command 
+
+```
+$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
+```
+
+to view the pod being restarted by the Kubernetes controller. In many cases the restart will be very quick and you may see that the primary-cluster-storage-0 pod is already running but will show an AGE of a few seconds. The application's UI should show the number of coherence servers drop to two, the data being re-partitioned, then a third coherence server reappearing and then the data being re-partitioned again. 
+
+## Recovery from Node Failure
+
+We will now remove a worker node from the Kubernetes cluster and observe how Kubernetes maintains our Coherence cluster at three servers. Locate the London OKE cluster homepage in the OCI console. 
+
+![Screenshot from 2020-09-29 16-16-16](Screenshot%20from%202020-09-29%2016-16-16-1601451821972.png)
+
+Click Node Pools to view the single node pool:
+
+![Screenshot from 2020-09-29 16-22-47](Screenshot%20from%202020-09-29%2016-22-47-1601451877786.png)
+
+Select Scale and on the resulting screen change 3 nodes to 2 and press the blue Scale button. The last worker node to be added will be removed. Monitor the state of the application via the application's UI and also by running:
+
+```
+$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
+```
+
+You should see that the number of pods is retsored to 3 and the application rebalances the cache data as the number of cache servers drops and is then restored to the desired state. 
+
+## Cache Federation Across OCI Regions
 
