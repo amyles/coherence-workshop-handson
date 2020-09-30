@@ -113,7 +113,7 @@ $ less ~/coherence-demo/yaml/primary-cluster.yaml
 
 The manifest defines two Coherence clusters, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will take care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file.
 
-NOTE: It is possible to Maximis the Cloud Shell window in order to make looking at the file a little easier.
+NOTE: It is possible to Maximise the Cloud Shell window in order to make looking at the file a little easier.
 
 ```yaml
 apiVersion: coherence.oracle.com/v1
