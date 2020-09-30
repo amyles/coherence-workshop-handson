@@ -195,6 +195,8 @@ The output will list the addresses under EXTERNAL-IP column, copy any one and en
 
 http://*<EXTERNAL-IP*>:32636/application/index.html This will open the UI:
 
+When the application comes up, you will need to close the information window by hitting the "Dont Show this Again" button.
+
 ![image-20200929152901818](image-20200929152901818.png)
 
 ## Scale the OKE Cluster
