@@ -47,11 +47,12 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
 *         context-cqtsyzvge2w   cluster-cqtsyzvge2w   user-cqtsyzvge2w  
 ```
 
-Rename the context to lhr which should prove to be a little more memorable! 
+Rename the context to lhr which should prove to be a little more memorable!
+The following command will need to reflect the context name returned from the command above.
 
 ```
-$ kubectl config rename-context context-cqtsyzvge2w lhr
-Context "context-cqtsyzvge2w" renamed to "lhr".
+$ kubectl config rename-context <CONTEXT_NAME> lhr
+Context "context-<whatyourswascalled>" renamed to "lhr".
 ```
 
 ## Prepare the London Cluster for Coherence
