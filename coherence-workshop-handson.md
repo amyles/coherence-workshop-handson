@@ -223,7 +223,7 @@ Back in the Cloud Shell issue the following command to see the new node being ad
 kubectl get nodes -w
 ```
 
-The -w flag will cause the command to wait until the new node is added. This usually takes a few moments so this is a good point to have a tea break! 
+The -w flag will cause the command to wait until the new node is added. This usually takes a few *minutes* so this is a good point to have a tea break! 
 
 Once the new node is added stop the command with ^c. Check  you have three nodes in the ready state with:
 
