@@ -279,6 +279,7 @@ $ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
 You should see the new pod being added and transitioning to the Running state. Note the the pod is running on the new worker node.
+Note: You will need to issue a ctrl c to exit this command.
 
 In the application UI note that a new Coherence server is shown. The cache data will have been re-partitioned across all three servers:
 
