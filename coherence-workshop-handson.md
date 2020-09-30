@@ -135,7 +135,7 @@ Press "q" to exit viewing the manifest.
 Deploy the primary Coherence cluster to the London OKE cluster:
 
 ```
-$ kubectl apply -f ~/coherence-demo/yaml/primary-cluster.yaml
+$ kubectl apply -f -n coherence-demo-ns ~/coherence-demo/yaml/primary-cluster.yaml
 ```
 
 To check the state of the Coherence cluster issue the command:
