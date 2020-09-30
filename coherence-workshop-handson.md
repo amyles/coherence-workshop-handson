@@ -34,9 +34,10 @@ kubectl get nodes -o wide
 
 in the cloud shell window.
 
-You can now close the "Access Your Cluster" window.
 
 ![image-20200929091157353](image-20200929091157353.png)
+
+You can now close the "Access Your Cluster" window.
 
 We will now rename the context created to allow us to switch between the London and Frankfurt clusters later in the lab. Query the current context with the command:
 
