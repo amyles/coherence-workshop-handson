@@ -18,7 +18,7 @@ To get started locate the OCI username and password assigned to you and open the
 
 //TODO - Screenshots of login process
 
-We will now configure kubectl in cloud shell to work with the London OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate the Developer Services entry and then the Kubernetes Clusters entry.
+We will now configure kubectl in cloud shell to work with the London OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
 
 ![image-20200929084456958](image-20200929084456958.png)
 
