@@ -143,7 +143,7 @@ To check the state of the Coherence cluster issue the command:
 ```
 $ kubectl get coherence -n coherence-demo-ns
 NAME                      CLUSTER           ROLE      REPLICAS   READY   PHASE
-primary-cluster-http      primary-cluster   http      2          2       Ready
+primary-cluster-http      primary-cluster   http      1          1       Ready
 primary-cluster-storage   primary-cluster   storage   2          2       Ready
 ```
 
