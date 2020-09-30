@@ -191,7 +191,7 @@ List the public IP addresses of the worker nodes:
 $ kubectl get nodes -owide
 ```
 
-The output will list the addresses under EXTERNAL-IP column, copy any one and enter the URL http://<EXTERNAL-IP>:32636/application/index.html This will open the UI:
+The output will list the addresses under EXTERNAL-IP column, copy any one and enter the URL http://EXTERNAL-IP:32636/application/index.html This will open the UI:
 
 ![image-20200929152901818](image-20200929152901818.png)
 
