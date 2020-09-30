@@ -152,34 +152,33 @@ The basic kubernetes resources created by the Coherence operator can be seen wit
 ```
 $ kubectl get all -n coherence-demo-ns
 NAME                                      READY   STATUS    RESTARTS   AGE
-pod/coherence-operator-845c87bd5f-766px   1/1     Running   0          18h
-pod/primary-cluster-http-0                1/1     Running   0          4h46m
-pod/primary-cluster-http-1                1/1     Running   1          20h
-pod/primary-cluster-storage-0             1/1     Running   0          4h46m
-pod/primary-cluster-storage-1             1/1     Running   2          20h
-pod/primary-cluster-storage-2             1/1     Running   0          4h46m
+pod/coherence-operator-845c87bd5f-btr4c   1/1     Running   0          22m
+pod/primary-cluster-http-0                1/1     Running   0          8m17s
+pod/primary-cluster-storage-0             1/1     Running   0          8m17s
+pod/primary-cluster-storage-1             1/1     Running   0          8m17s
 
 NAME                                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
-service/coherence-operator-metrics           ClusterIP   10.96.220.115   <none>        8383/TCP,8686/TCP   5d1h
-service/primary-cluster-http-http            NodePort    10.96.112.56    <none>        8080:32636/TCP      20h
-service/primary-cluster-http-metrics         ClusterIP   10.96.171.136   <none>        9612/TCP            20h
-service/primary-cluster-http-sts             ClusterIP   None            <none>        7/TCP               20h
-service/primary-cluster-http-wka             ClusterIP   None            <none>        7/TCP               20h
-service/primary-cluster-storage-federation   ClusterIP   10.96.107.5     <none>        40000/TCP           20h
-service/primary-cluster-storage-metrics      ClusterIP   10.96.80.100    <none>        9612/TCP            20h
-service/primary-cluster-storage-np           NodePort    10.96.149.115   <none>        40000:31602/TCP     4d19h
-service/primary-cluster-storage-sts          ClusterIP   None            <none>        7/TCP               20h
-service/primary-cluster-storage-wka          ClusterIP   None            <none>        7/TCP               20h
+service/coherence-operator-metrics           ClusterIP   10.96.75.31     <none>        8383/TCP,8686/TCP   22m
+service/primary-cluster-http-http            ClusterIP   10.96.195.164   <none>        8080/TCP            8m18s
+service/primary-cluster-http-metrics         ClusterIP   10.96.118.93    <none>        9612/TCP            8m18s
+service/primary-cluster-http-np              NodePort    10.96.120.175   <none>        8080:32636/TCP      8m19s
+service/primary-cluster-http-sts             ClusterIP   None            <none>        7/TCP               8m18s
+service/primary-cluster-http-wka             ClusterIP   None            <none>        7/TCP               8m18s
+service/primary-cluster-storage-federation   ClusterIP   10.96.87.167    <none>        40000/TCP           8m19s
+service/primary-cluster-storage-metrics      ClusterIP   10.96.111.50    <none>        9612/TCP            8m19s
+service/primary-cluster-storage-np           NodePort    10.96.210.173   <none>        40000:31602/TCP     8m19s
+service/primary-cluster-storage-sts          ClusterIP   None            <none>        7/TCP               8m19s
+service/primary-cluster-storage-wka          ClusterIP   None            <none>        7/TCP               8m19s
 
 NAME                                 READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/coherence-operator   1/1     1            1           5d1h
+deployment.apps/coherence-operator   1/1     1            1           22m
 
 NAME                                            DESIRED   CURRENT   READY   AGE
-replicaset.apps/coherence-operator-845c87bd5f   1         1         1       5d1h
+replicaset.apps/coherence-operator-845c87bd5f   1         1         1       22m
 
 NAME                                       READY   AGE
-statefulset.apps/primary-cluster-http      2/2     20h
-statefulset.apps/primary-cluster-storage   3/3     20h
+statefulset.apps/primary-cluster-http      1/1     8m18s
+statefulset.apps/primary-cluster-storage   2/2     8m19s
 ```
 
 ## Connect to the Demo App on the London OKE Cluster
