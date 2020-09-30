@@ -203,7 +203,7 @@ When the application comes up, you will need to close the information window by 
 
 The OKE cluster has been provisioned with two worker nodes, we will add a third worker node by scaling the cluster's only node pool. We will then scale our Coherence cluster to use the new compute capacity. 
 
-Ensure you are still logged in to the OCI Console and on the London cluster's homepage. If not access the hamburger in the top left hand corner then select Developer Services then select Kubernetes Clusters and pick your assigned cluster form the list. In the resources menu on the left select Node Pools
+Ensure you are still logged in to the OCI Console and on the London cluster's homepage. If you are not, as you did before access the hamburger in the top left hand corner then select "Developer Services" then "Kubernetes Clusters" and pick your assigned cluster form the list. In the resources menu on the left select Node Pools
 
  ![Screenshot from 2020-09-29 16-16-16](Screenshot%20from%202020-09-29%2016-16-16.png)
 
