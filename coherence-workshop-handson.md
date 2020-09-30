@@ -248,6 +248,7 @@ Now increase the replica count of the coherence storage cluster from 2 to 3. The
 ```
 $ vi ~/coherence-demo/yaml/primary-cluster.yaml
 ```
+Remember you can expand the Cloud Shell window to make this easier.
 
 Use the arrow keys to move the cursor to the replica field value of the primary-cluster-storage-resource:
 
