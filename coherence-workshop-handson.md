@@ -241,7 +241,7 @@ First check how the existing two pods of the storage cluster are distributed acr
 $ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
 ```
 
-This will show that the two pods are running on different worker nodes, the Coherence operator enforces anti-affinity. 
+This will show that the two pods are running on different worker nodes (different NODE ip's), the Coherence operator enforces anti-affinity. 
 
 Now increase the replica count of the coherence storage cluster from 2 to 3. There are many ways to do this but we will edit the manifest file and reapply it. Open the primary-cluster.yaml in vi :
 
