@@ -115,8 +115,6 @@ The manifest defines two Coherence clusters, one for storage and one for the use
 
 NOTE: It is possible to Maximise the Cloud Shell window in order to make looking at the file a little easier.
 
-Press "q" to exit viewing the manifest.
-
 ```yaml
 apiVersion: coherence.oracle.com/v1
 kind: Coherence
@@ -131,6 +129,8 @@ image: lhr.ocir.io/oscemea001/coherence/coherence-demo:4.0.0-SNAPSHOT
   imagePullPolicy: Always
   replicas: 3
 ```
+
+Press "q" to exit viewing the manifest.
 
 Deploy the primary Coherence cluster to the London OKE cluster:
 
