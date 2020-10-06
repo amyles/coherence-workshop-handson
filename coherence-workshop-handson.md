@@ -341,7 +341,7 @@ You should see that the number of pods is restored to 3 and the application reba
 
 ## Cache Federation Across OCI Regions
 
-Oracle Cloud Infrastructure is available globally through [regions](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm). In the second part of this exercise we will use the federation features of Coherence to show how a federated cache can be distributed across these regions to allow clients to be geographically local to their cache data .A second OKE cluster has been provisioned in the Frankfurt region. We will deploy the sample application to this new Kubernetes cluster and enable the bi-directional federation of data between them. 
+Oracle Cloud Infrastructure is available globally through [regions](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm). In the second part of this exercise we will use the federation features of Coherence to show how a federated cache can be distributed across these regions to allow clients to be geographically local to their cache data. A second OKE cluster has been provisioned in the Frankfurt region. We will deploy the sample application to this new Kubernetes cluster and enable the bi-directional federation of data between them. 
 
 ## Establish Access to Frankfurt Cluster
 
