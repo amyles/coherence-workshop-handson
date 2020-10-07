@@ -379,7 +379,9 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
 
 You can now close the "Access Your Cluster" window.
 
-For ease of use we will rename the new context to fra. Copy the name of the new context that begins with context and then a hyphen and a GIUD. 
+For ease of use we will rename the new context to fra. Copy the name of the new context that begins with context and then a hyphen and a GUID. 
+
+This is similar to what you did in the first part of this lab, just the other context.
 
 ```
 $ kubectl config rename-context context-blahblah fra
