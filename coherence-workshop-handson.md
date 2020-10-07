@@ -377,6 +377,8 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
           lhr                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
 ```
 
+You can now close the "Access Your Cluster" window.
+
 For ease of use we will rename the new context to fra. Copy the name of the new context that begins with context and then a hyphen and a GIUD. 
 
 ```
