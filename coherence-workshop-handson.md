@@ -388,7 +388,7 @@ $ kubectl config rename-context context-blahblah fra
 Context "context-blahblah" renamed to "fra".
 ```
 
-## Prepare the London Cluster for Coherence
+## Prepare the Frankfurt Cluster for Coherence
 
 We will create a new Kubernetes namespace and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our Frankfurt cluster. 
 
