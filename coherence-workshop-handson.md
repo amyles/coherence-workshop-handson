@@ -485,9 +485,9 @@ Once the count has reached 100,000 in the secondary Coherence cluster add some t
 
  ![image-20201002153352270](image-20201002153352270.png)
 
-Add 10,000 new trades and switch back to the primary cluster to check that the trades appear to have been added there. 
+Add 10,000 new trades (Press the 'Add Trades' button enter 10000 and hit "OK") and switch back to the primary cluster to check that the trades appear to have been added there. 
 
-In the primary Coherence cluster UI select the option to vary the prices randomly. 
+In the primary Coherence cluster UI select the option to vary the prices randomly (Enable "Real-Time Price Updates" in the top left chart). 
 
 ![image-20201002160745507](image-20201002160745507.png)
 
