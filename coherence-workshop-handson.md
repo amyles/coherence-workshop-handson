@@ -466,7 +466,7 @@ Switched to context "lhr".
 Then get one of the public IPs of the London cluster:
 
 ```
-$ kubectl get nodes -owide
+$ kubectl get nodes -o wide
 ```
 
 Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :32636/application/index.html. The UI should open for the application running in London. 
