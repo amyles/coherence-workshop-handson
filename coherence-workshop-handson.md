@@ -8,6 +8,8 @@ This lab will demonstrate the steps required to get Oracle Coherence up and runn
 
 Name of the OCI tenancy used to host the lab.
 
+The OCI compartment where your resources will be located.
+
 A username and password for the OCI tenancy used for the lab.
 
 Details of the two Oracle Container Engine (OKE) clusters that will be used for the lab. 
@@ -42,6 +44,8 @@ On the OKE clusters homepage locate the cluster assigned to you. Ensure you are 
 
 ![image-20201002125916194](image-20201002125916194.png)
 
+Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config. 
+
 Paste the command into the cloudshell prompt:
 
 ```
@@ -49,20 +53,27 @@ $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-This will copy the new cluster's kubeconfig file and merge it with the existing file at ~/.kube/config which already contained the config for the first cluster. Check that there are now two contexts available:
+Check that the context is available:
 
 ```
 $ kubectl config get-contexts
 CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
-*         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
-          lhr                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
+*         context-whatyoursiscalled   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
 ```
+
+You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
+
+```bash
+kubectl get nodes -o wide
+```
+
+in the cloud shell window.
 
 For ease of use we will rename the new context to **fra**. Copy the name of the new context that begins with context and then a hyphen and a GIUD. 
 
 ```
-$ kubectl config rename-context context-blahblah fra
-Context "context-blahblah" renamed to "fra".
+$ kubectl config rename-context context-whatyoursiscalled fra
+Context "context-whatyoursiscalled" renamed to "fra".
 ```
 
 We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
@@ -87,7 +98,25 @@ On the OKE clusters homepage locate the cluster assigned to you. Ensure you are 
 
 ![image-20200929090516869](image-20200929090516869.png)
 
-Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config. You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
+Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed.
+
+Paste the command into the cloudshell prompt:
+
+```
+$ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
+Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
+```
+
+This will copy the new cluster's kubeconfig file and merge it with the existing file at ~/.kube/config which already contained the config for the first cluster. Check that there are now two contexts available:
+
+```
+$ kubectl config get-contexts
+CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
+*         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
+          fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
+```
+
+You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
 
 ```bash
 kubectl get nodes -o wide
@@ -105,10 +134,11 @@ We will now rename the context created to allow us to switch between the London 
 ```
 $ kubectl config get-contexts
 CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
-*         context-cqtsyzvge2w   cluster-cqtsyzvge2w   user-cqtsyzvge2w  
+*         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
+          fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w 
 ```
 
-Rename the context to **lhr** which should prove to be a little more memorable!
+Rename the new London context to **lhr** which should prove to be a little more memorable!
 The following command will need to reflect the context name returned from the command above.
 
 ```
@@ -506,7 +536,7 @@ secondary-cluster-storage-1           1/1     Running   0          2m7s
 Open the UI for the secondary application. First identify the public IP of the worker nodes in the Frankfurt OKE cluster:
 
 ```
-$ kubectl get nodes -owide
+$ kubectl get nodes -o wide
 ```
 
 Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :31715/application/index.html. The UI should open for the application running in Frankfurt. Note that the UI shows that this cluster is empty and contains no trades. 
@@ -523,7 +553,7 @@ Switched to context "lhr".
 Then get one of the public IPs of the London cluster:
 
 ```
-$ kubectl get nodes -owide
+$ kubectl get nodes -o wide
 ```
 
 Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :32636/application/index.html. The UI should open for the application running in London. 
@@ -542,9 +572,9 @@ Once the count has reached 100,000 in the secondary Coherence cluster add some t
 
  ![image-20201002153352270](image-20201002153352270.png)
 
-Add 10,000 new trades and switch back to the primary cluster to check that the trades appear to have been added there. 
+Add 10,000 new trades (Press the 'Add Trades' button enter 10000 and hit "OK") and switch back to the primary cluster to check that the trades appear to have been added there. 
 
-In the primary Coherence cluster UI select the option to vary the prices randomly. 
+In the primary Coherence cluster UI select the option to vary the prices randomly (Enable "Real-Time Price Updates" in the top left chart). 
 
 ![image-20201002160745507](image-20201002160745507.png)
 
