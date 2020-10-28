@@ -109,7 +109,7 @@ We will now configure kubectl in cloud shell to work with the London OKE cluster
 
 ![image-20200929084456958](image-20200929084456958.png)
 
-On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. 
+On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Click your assigned OKE cluster to view it's details. 
 
 ![image-20200929090516869](image-20200929090516869.png)
 
@@ -131,16 +131,11 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
           fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
 ```
 
-You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
+You should now be able to query your OKE cluster by running using the following kubectl command in the cloud shell window:
 
 ```bash
 kubectl get nodes -o wide
 ```
-
-in the cloud shell window.
-
-
-![image-20200929091157353](image-20200929091157353.png)
 
 You can now close the "Access Your Cluster" window.
 
