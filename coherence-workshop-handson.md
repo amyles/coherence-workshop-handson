@@ -79,7 +79,9 @@ kubectl get nodes -o wide
 
 If this is successful and you see your workers nodes with a STATUS of 'Ready' please close the 'Access Your Cluster' Window.
 
-For ease of use we will rename the new context to **fra**. Copy the name of the new context that begins with context and then a hyphen and a GIUD. 
+For ease of use we will rename the new context you listed with the get-contexts command to **fra**. 
+
+Copy the name of the new context that begins with context and then a hyphen and a GIUD and replace it in the command example below. 
 
 ```
 $ kubectl config rename-context context-whatyoursiscalled fra
