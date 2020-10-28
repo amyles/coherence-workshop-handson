@@ -40,20 +40,30 @@ We will now configure kubectl in cloud shell to work with the Frankfurt OKE clus
 
 ![image-20201002125651445](image-20201002125651445.png)
 
-On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Open Cloud Shell with the prompt icon in the grey bar across the top of the screen. Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. Copy the oci cli command listed in the pop up window. 
+On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. 
+
+Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. 
 
 ![image-20201002125916194](image-20201002125916194.png)
 
-Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config. 
+Configuring kubectl is a case of just following the instructions on the screen. 
 
-Paste the command into the cloudshell prompt:
+First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. 
+
+Then copy the oci cli command.
+
+Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. 
+
+The command will copy the kube config file to the standard location at ~/.kube/config. 
+
+Paste and enter the command into the cloudshell prompt:
 
 ```
 $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-Check that the context is available:
+Check that the context is available by typing the command below (kubectl config get-contexts) :
 
 ```
 $ kubectl config get-contexts
@@ -61,22 +71,27 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
 *         context-whatyoursiscalled   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
 ```
 
-You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
+You should now be able to query your OKE cluster by running using the following kubectl command:
 
 ```bash
 kubectl get nodes -o wide
 ```
 
-in the cloud shell window.
+If this is successful and you see your workers nodes with a STATUS of 'Ready' please close the 'Access Your Cluster' Window.
 
-For ease of use we will rename the new context to **fra**. Copy the name of the new context that begins with context and then a hyphen and a GIUD. 
+For ease of use we will rename the new context you listed with the get-contexts command to **fra**. 
+
+Copy the name of the new context that begins with context and then a hyphen and a GIUD and replace it in the command example below. 
 
 ```
 $ kubectl config rename-context context-whatyoursiscalled fra
 Context "context-whatyoursiscalled" renamed to "fra".
 ```
+Run the kubectl config get-contexts again and you will see the change has been made.
 
 We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
+
+Copy end enter the 2 commands below into your cloud shell.
 
 ```
 $ export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
@@ -94,7 +109,7 @@ We will now configure kubectl in cloud shell to work with the London OKE cluster
 
 ![image-20200929084456958](image-20200929084456958.png)
 
-On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. 
+On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Click your assigned OKE cluster to view it's details. 
 
 ![image-20200929090516869](image-20200929090516869.png)
 
@@ -116,16 +131,11 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
           fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
 ```
 
-You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
+You should now be able to query your OKE cluster by running using the following kubectl command in the cloud shell window:
 
 ```bash
 kubectl get nodes -o wide
 ```
-
-in the cloud shell window.
-
-
-![image-20200929091157353](image-20200929091157353.png)
 
 You can now close the "Access Your Cluster" window.
 
@@ -142,7 +152,7 @@ Rename the new London context to **lhr** which should prove to be a little more 
 The following command will need to reflect the context name returned from the command above.
 
 ```
-$ kubectl config rename-context <CONTEXT_NAME> lhr
+$ kubectl config rename-context context-<whatyourswascalled> lhr
 Context "context-<whatyourswascalled>" renamed to "lhr".
 ```
 
