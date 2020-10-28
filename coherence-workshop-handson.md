@@ -152,7 +152,7 @@ Switch to the new **lhr** context
 $ kubectl config use-context lhr
 ```
 
-We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
+We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
 
 ```
 $ export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
