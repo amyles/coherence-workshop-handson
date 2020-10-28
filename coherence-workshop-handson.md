@@ -87,6 +87,7 @@ Copy the name of the new context that begins with context and then a hyphen and 
 $ kubectl config rename-context context-whatyoursiscalled fra
 Context "context-whatyoursiscalled" renamed to "fra".
 ```
+Run the kubectl config get-contexts again and you will see the change has been made.
 
 We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
 
