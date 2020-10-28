@@ -152,7 +152,7 @@ Rename the new London context to **lhr** which should prove to be a little more 
 The following command will need to reflect the context name returned from the command above.
 
 ```
-$ kubectl config rename-context <CONTEXT_NAME> lhr
+$ kubectl config rename-context context-<whatyourswascalled> lhr
 Context "context-<whatyourswascalled>" renamed to "lhr".
 ```
 
