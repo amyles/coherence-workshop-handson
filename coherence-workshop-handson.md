@@ -42,17 +42,21 @@ We will now configure kubectl in cloud shell to work with the Frankfurt OKE clus
 
 On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. 
 
-Open Cloud Shell with the prompt icon in the grey bar across the top of the screen. 
-
 Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. 
-
-Copy the oci cli command listed in the pop up window. 
 
 ![image-20201002125916194](image-20201002125916194.png)
 
-Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config. 
+Configuring kubectl is a case of just following the instructions on the screen. 
 
-Paste the command into the cloudshell prompt:
+First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. 
+
+Then copy the oci cli command.
+
+Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. 
+
+The command will copy the kube config file to the standard location at ~/.kube/config. 
+
+Paste and enter the command into the cloudshell prompt:
 
 ```
 $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
