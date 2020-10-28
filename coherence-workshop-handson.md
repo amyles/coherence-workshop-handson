@@ -41,8 +41,11 @@ We will now configure kubectl in cloud shell to work with the Frankfurt OKE clus
 ![image-20201002125651445](image-20201002125651445.png)
 
 On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. 
+
 Open Cloud Shell with the prompt icon in the grey bar across the top of the screen. 
+
 Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. 
+
 Copy the oci cli command listed in the pop up window. 
 
 ![image-20201002125916194](image-20201002125916194.png)
