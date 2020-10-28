@@ -63,7 +63,7 @@ $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-Check that the context is available:
+Check that the context is available by typinge the command below (kubectl config get-contexts) :
 
 ```
 $ kubectl config get-contexts
@@ -71,13 +71,13 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
 *         context-whatyoursiscalled   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
 ```
 
-You should now be able to query your OKE cluster by running using the pre-installed kubectl command:
+You should now be able to query your OKE cluster by running using the following kubectl command:
 
 ```bash
 kubectl get nodes -o wide
 ```
 
-in the cloud shell window.
+If this is successful and you see your workers nodes with a STATUS of 'Ready' please close the 'Access Your Cluster' Window.
 
 For ease of use we will rename the new context to **fra**. Copy the name of the new context that begins with context and then a hyphen and a GIUD. 
 
