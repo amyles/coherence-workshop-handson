@@ -532,7 +532,8 @@ secondary-cluster-http      secondary-cluster   http      1                  Cre
 secondary-cluster-storage   secondary-cluster   storage   2                  Created
 ```
 
-Check that all the underlying pods are in the Running state:
+Check that all the underlying pods are in the Running state.
+Wait until you see output similar to that below which will mean everything is running.
 
 ```
 $ kubectl get po -n coherence-demo-ns
