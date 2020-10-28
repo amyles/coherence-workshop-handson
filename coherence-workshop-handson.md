@@ -325,7 +325,7 @@ The user interface of the Coherence Demo app is exposed as a NodePort service in
 List the public IP addresses of the worker nodes:
 
 ```
-$ kubectl get nodes -owide
+$ kubectl get nodes -o wide
 ```
 
 The output will list the addresses under EXTERNAL-IP column, copy any one and enter the URL changing EXTERNAL_IP for a proper address: 
