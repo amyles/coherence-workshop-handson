@@ -63,7 +63,7 @@ $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-Check that the context is available by typinge the command below (kubectl config get-contexts) :
+Check that the context is available by typing the command below (kubectl config get-contexts) :
 
 ```
 $ kubectl config get-contexts
