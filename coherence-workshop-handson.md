@@ -34,7 +34,7 @@ Switch to the Frankfurt region using the region chooser in the grey bar at the t
 
 ![Screenshot from 2020-10-02 10-52-18](Screenshot%20from%202020-10-02%2010-52-18.png)
 
-Once in the Frankfurt region ensure you are still in the specified compartment. 
+Once in the Frankfurt region ensure you are still in the specified compartment. It will be a sub-compartment of coherence_ws and named coherence_userN_ws where N is your student number.
 
 We will now configure kubectl in cloud shell to work with the Frankfurt OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
 
