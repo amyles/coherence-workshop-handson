@@ -56,7 +56,7 @@ Your cloud shell is pre-authenticated against your OCI account so no credentials
 
 The command will copy the kube config file to the standard location at ~/.kube/config. 
 
-Copy the oci cli command from the console and paste it into the cloudshell prompt. For example (example only, do not copy):
+Copy the oci cli command from the OCI console dialog and paste it into the cloudshell prompt. For example (example only, do not copy):
 
 ```
 $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
