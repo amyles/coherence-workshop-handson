@@ -6,11 +6,11 @@ This lab will demonstrate the steps required to get Oracle Coherence up and runn
 
 ## Requirements
 
-Name of the OCI tenancy used to host the lab.
+Name of the OCI tenancy used to host the lab. This will be supplied in the student guide.
 
-The OCI compartment where your resources will be located.
+The OCI compartment where your resources will be located. This will be supplied in the student guide.
 
-A username and password for the OCI tenancy used for the lab.
+A username and password for the OCI tenancy used for the lab. This will be supplied in the student guide.
 
 Details of the two Oracle Container Engine (OKE) clusters that will be used for the lab. 
 
@@ -18,7 +18,7 @@ Details of the two Oracle Container Engine (OKE) clusters that will be used for 
 
 This lab will use two OKE clusters, one in the London region and the other in the Frankfurt region. We will interact with the OKE clusters via standard Kubernetes tools like kubectl and helm. Fortunately OCI provides a [Cloud Shell](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellintro.htm) environment with these tools already installed that we can use as a virtual bastion host. 
 
-To get started locate the OCI username and password assigned to you and open the OCI Console at https://console.uk-london-1.oraclecloud.com/ and enter the tenancy name.
+To get started locate the OCI username and password assigned to you and open the OCI Console at https://console.uk-london-1.oraclecloud.com/ and enter the tenancy name. Your username, one time password and tenancy will be listed in the student guide.
 
 ![image-20201027111619204](image-20201027111619204.png)
 
@@ -26,7 +26,7 @@ Select Continue and then enter the username and password issued to you on the **
 
 ![image-20201027112259473](image-20201027112259473.png)
 
-Press sign in.
+Press sign in. You will be prompted to enter a new password, pick something memorable.
 
 ## Establish Access to Frankfurt Cluster
 
