@@ -2,7 +2,7 @@
 
 ## Objective
 
-This lab will demonstrate the steps required to get Oracle Coherence up and running on Oracle Container Engine (OKE) using the Coherence Operator. It will then explore some of the advantages of running Coherence on Kubernetes on OCI. 
+This lab will demonstrate the steps required to get Oracle Coherence up and running on Oracle Container Engine (OKE) using the Coherence Operator. It will then explore some of the advantages of running Coherence on Kubernetes on OCI. As an example Coherence application we will use the well known Coherence Demo available at  https://github.com/coherence-community/coherence-demo
 
 ## Requirements
 
@@ -16,47 +16,57 @@ Details of the two Oracle Container Engine (OKE) clusters that will be used for 
 
 ## Login in to the OCI Console
 
-This lab will use two OKE clusters, one in the London region and the other in the Frankfurt region. We will interact with the OKE clusters via standard Kubernetes tools like kubectl and helm. Fortunately OCI provides a [Cloud Shell](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellintro.htm) environment with these tools already installed that we can use as a virtual bastion host. 
+Our first task will be to connect to Oracle's Cloud Infrastructure for the first time and locate the resources we be using throughout the lab.
+
+This lab will use two OKE clusters, one in the London region and the other in the Frankfurt region. We will interact with the OKE clusters via standard Kubernetes tools like [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) and [helm](https://helm.sh/). Fortunately OCI provides a [Cloud Shell](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellintro.htm) environment with these tools already installed that we can use as a virtual bastion host. 
 
 To get started locate the OCI username and password assigned to you and open the OCI Console at https://console.uk-london-1.oraclecloud.com/ and enter the tenancy name. Your username, one time password and tenancy will be listed in the student guide.
 
 ![image-20201027111619204](image-20201027111619204.png)
 
+
+
 Select Continue and then enter the username and password issued to you on the **right hand side** of the log in screen:
 
 ![image-20201027112259473](image-20201027112259473.png)
 
-Press sign in. You will be prompted to enter a new password, pick something memorable.
+Press sign in. 
+
+Note: You will be prompted to enter a new password, pick something memorable.
 
 ## Establish Access to Frankfurt Cluster
 
-Switch to the Frankfurt region using the region chooser in the grey bar at the top of the screen. 
+We'll work against the OKE cluster in Franfurt first. Switch to the Frankfurt region using the region chooser in the grey bar at the top of the screen. 
 
 ![Screenshot from 2020-10-02 10-52-18](Screenshot%20from%202020-10-02%2010-52-18.png)
 
-Once in the Frankfurt region ensure you are still in the specified compartment. It will be a sub-compartment of coherence_ws and named coherence_userN_ws where N is your student number.
+
 
 We will now configure kubectl in cloud shell to work with the Frankfurt OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
 
 ![image-20201002125651445](image-20201002125651445.png)
 
+
+
+Once in the Frankfurt region ensure you are in the specified compartment. Resources in OCI are isolated in "[compartments](https://docs.cloud.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcompartments.htm#Working)" . Your resources will be in a sub-compartment of **coherence_ws** named **coherence_userN_ws** where N is your student number. You can use the compartment chooser on the left hand side to switch, either by selecting it explicitly or by typing to narrow down the selection:
+
+![image-20201207154345271](image-20201207154345271.png)
+
 On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. 
 
-Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button. 
+Click your assigned OKE cluster to view it's details, then select the blue "Access Cluster" button to show the following dialogue: 
 
 ![image-20201002125916194](image-20201002125916194.png)
+
+
 
 Configuring kubectl is a case of just following the instructions on the screen. 
 
 First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. 
 
-Then copy the oci cli command.
+Then copy the oci cli command listed in step 2 into your cloud shell prompt. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config in your cloud shell. 
 
-Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. 
-
-The command will copy the kube config file to the standard location at ~/.kube/config. 
-
-Copy the oci cli command from the OCI console dialog and paste it into the cloudshell prompt. For example (example only, do not copy):
+Copy the oci cli command from the OCI console dialog and paste it into the cloud shell prompt. For example (example only, do not copy):
 
 ```
 $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
@@ -66,22 +76,14 @@ Existing Kubeconfig file found at /home/your_user/.kube/config and new config me
 Check that the context is available by typing the command below (kubectl config get-contexts) :
 
 ```
-$ kubectl config get-contexts
+kubectl config get-contexts
 CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
 *         context-whatyoursiscalled   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
 ```
 
-You should now be able to query your OKE cluster by running using the following kubectl command:
+For ease of use we will rename the new kubectl context you created to **fra**. 
 
-```bash
-kubectl get nodes -o wide
-```
-
-If this is successful and you see your workers nodes with a STATUS of 'Ready' please close the 'Access Your Cluster' Window.
-
-For ease of use we will rename the new context you listed with the get-contexts command to **fra**. 
-
-Copy the name of the new context that begins with context and then a hyphen and a GIUD and replace it in the command example below. 
+Copy the name of the new context that begins with "context" and then a hyphen and a GIUD from the output of the previous command  and replace it in the command example below. 
 
 ```
 $ kubectl config rename-context context-whatyoursiscalled fra
@@ -89,46 +91,87 @@ Context "context-whatyoursiscalled" renamed to "fra".
 ```
 Run the kubectl config get-contexts again and you will see the change has been made.
 
+You should now be able to query your OKE cluster by using the following kubectl command:
+
+```bash
+kubectl get nodes -o wide
+```
+
+If this is successful and you see your workers nodes with a STATUS of 'Ready'. Please close the 'Access Your Cluster' Window.
+
 We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
 
 Copy end enter the 2 commands below into your cloud shell.
 
 ```
-$ export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
+export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
 
-$ echo $SECONDARY_CLUSTER_HOST
+echo $SECONDARY_CLUSTER_HOST
 ```
 
 ## Establish Access to London Cluster
+
+We now need to carry out the same steps in our other OKE cluster.
 
 Switch to the London region using the region chooser in the grey bar at the top of the screen. 
 
 ![Screenshot from 2020-10-27 11-29-08](Screenshot%20from%202020-10-27%2011-29-08.png)
 
+
+
 We will now configure kubectl in cloud shell to work with the London OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
 
 ![image-20200929084456958](image-20200929084456958.png)
+
+
 
 On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Click your assigned OKE cluster to view it's details. 
 
 ![image-20200929090516869](image-20200929090516869.png)
 
-Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed.
 
-Paste the command into the cloudshell prompt:
+
+Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command from step 2 and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed.
+
+For **example** (do not cut & paste):
 
 ```
 $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-This will copy the new cluster's kubeconfig file and merge it with the existing file at ~/.kube/config which already contained the config for the first cluster. Check that there are now two contexts available:
+This will copy the new cluster's kubeconfig file and merge it with the existing file at ~/.kube/config which already contained the config for the Frankfurt cluster. Check that there are now two contexts available by running the following:
 
 ```
-$ kubectl config get-contexts
+kubectl config get-contexts
 CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
 *         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
           fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
+```
+
+You can now close the "Access Your Cluster" window.
+
+We will now rename the new context created to allow us to easily switch between the London and Frankfurt clusters later in the lab. Query the current context with the command:
+
+```
+kubectl config get-contexts
+CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
+*         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
+          fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w 
+```
+
+Rename the new London context to **lhr** which should prove to be a little more memorable!
+The following command will need to reflect the context name returned from the command above in your environment:
+
+```
+kubectl config rename-context context-<whatyourswascalled> lhr
+Context "context-<whatyourswascalled>" renamed to "lhr".
+```
+
+Switch to the new **lhr** context
+
+```
+kubectl config use-context lhr
 ```
 
 You should now be able to query your OKE cluster by running using the following kubectl command in the cloud shell window:
@@ -137,43 +180,18 @@ You should now be able to query your OKE cluster by running using the following 
 kubectl get nodes -o wide
 ```
 
-You can now close the "Access Your Cluster" window.
-
-We will now rename the context created to allow us to switch between the London and Frankfurt clusters later in the lab. Query the current context with the command:
-
-```
-$ kubectl config get-contexts
-CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
-*         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
-          fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w 
-```
-
-Rename the new London context to **lhr** which should prove to be a little more memorable!
-The following command will need to reflect the context name returned from the command above.
-
-```
-$ kubectl config rename-context context-<whatyourswascalled> lhr
-Context "context-<whatyourswascalled>" renamed to "lhr".
-```
-
-Switch to the new **lhr** context
-
-```
-$ kubectl config use-context lhr
-```
-
 We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
 
 ```
-$ export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
+export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
 
-$ echo $PRIMARY_CLUSTER_HOST
+echo $PRIMARY_CLUSTER_HOST
 ```
 
 Check that you have the correct values:
 
 ```
-$ env | grep CLUSTER_HOST
+env | grep CLUSTER_HOST
 ```
 
 This command should return two **different** IP addresses! One from the lhr cluster and one from the fra cluster. 
@@ -188,13 +206,13 @@ We will create a new Kubernetes namespace and then install the [Coherence Operat
 $ kubectl config use-context lhr
 ```
 
-Create  new namespace to isolate the resources that are part of our lab, in the cloud shell terminal issue the command:
+Create a new Kubernetes namespace to isolate the resources that are part of our lab, in the cloud shell terminal issue the command:
 
 ```
 $ kubectl create namespace coherence-demo-ns
 ```
 
-Then add the Coherence Operator helm chart repo to the local, pre-installed helm utility. 
+Then add the Coherence Operator helm chart repo to the local, pre-installed helm utility. Helm is a package manager for Kubernetes analogous to yum for Oracle Linux, the packages are contained in charts. This command will make the Coherence operator's chart available locally:
 
 ```
 $ helm repo add coherence https://oracle.github.io/coherence-operator/charts
@@ -225,22 +243,24 @@ The pod should show as being in the Running state. The operator is now ready to 
 We will deploy the first Coherence cluster in the London OKE cluster. A pre-built manifest file defines all the resources needed to run a Coherence cluster for object storage and another, storage-disabled Coherence cluster for the user interface. The manifests are stored in a git repo that can be cloned in Cloud Shell and then deployed. Clone the repo:
 
 ```
-$ git clone https://gitlab.osc-cloud.com/coherence-workshop/coherence-demo.git
+git clone https://gitlab.osc-cloud.com/coherence-workshop/coherence-demo.git
 ```
 
 The contents of the repo will be copied to your Cloud Shell environment. Once complete change into the new directory:
 
 ```
-$ cd coherence-demo/
+cd coherence-demo/
 ```
 
-The resources are packaged as a helm chart. Review the manifests for the primary cluster:
+The resources are packaged as a helm chart. 
+
+Review the manifests for the primary cluster:
 
 ```
-$ less ~/coherence-demo/primary-cluster-chart/templates/primary-cluster.yaml
+less ~/coherence-demo/primary-cluster-chart/templates/primary-cluster.yaml
 ```
 
-The manifest defines two Coherence clusters, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will take care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file.
+The manifest defines two Coherence clusters, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will take care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file, the Operator has made Kubernetes aware of the application constructs of Coherence.
 
 NOTE: It is possible to Maximise the Cloud Shell window in order to make looking at the file a little easier.
 
@@ -251,7 +271,7 @@ metadata:
   name: primary-cluster-storage
 ```
 
-The manifest also contains details of the container image used as well as the number of replicas used:
+The manifest also contains details of the container image used as well as the number of replicas used. The image used is stored in [Oracle Cloud Infrastructure Registry](https://docs.cloud.oracle.com/en-us/iaas/Content/Registry/Concepts/registryoverview.htm):
 
 ```yaml
 image: lhr.ocir.io/oscemea001/coherence/coherence-demo:4.0.0-SNAPSHOT
@@ -264,21 +284,21 @@ Press "q" to exit viewing the manifest.
 Deploy the primary Coherence cluster to the London OKE cluster using helm:
 
 ```
-$ cd ~/coherence-demo/
+cd ~/coherence-demo/
 
-$ helm install primary-cluster --set primaryclusterhost=$PRIMARY_CLUSTER_HOST --set secondaryclusterhost=$SECONDARY_CLUSTER_HOST --set replicas=2 ./primary-cluster-chart/ -n coherence-demo-ns
+helm install primary-cluster --set primaryclusterhost=$PRIMARY_CLUSTER_HOST --set secondaryclusterhost=$SECONDARY_CLUSTER_HOST --set replicas=2 ./primary-cluster-chart/ -n coherence-demo-ns
 ```
 
 Check the chart has been installed OK, this command should show that the application and operator charts are in the deployed state:
 
 ```
-$ helm ls -n coherence-demo-ns
+helm ls -n coherence-demo-ns
 ```
 
 To check the state of the Coherence cluster issue the command which queries for the custom resource definition (CRD) for the Coherence clusters:
 
 ```
-$ kubectl get coherence -n coherence-demo-ns
+kubectl get coherence -n coherence-demo-ns
 NAME                      CLUSTER           ROLE      REPLICAS   READY   PHASE
 primary-cluster-http      primary-cluster   http      1          1       Ready
 primary-cluster-storage   primary-cluster   storage   2          2       Ready
@@ -287,7 +307,7 @@ primary-cluster-storage   primary-cluster   storage   2          2       Ready
 The basic kubernetes resources created by the Coherence operator can be seen with the following command which will list the pods, services, deployments, replicasets and statefulsets in the coherence-demo-ns namespace:
 
 ```
-$ kubectl get all -n coherence-demo-ns
+kubectl get all -n coherence-demo-ns
 NAME                                      READY   STATUS    RESTARTS   AGE
 pod/coherence-operator-845c87bd5f-btr4c   1/1     Running   0          22m
 pod/primary-cluster-http-0                1/1     Running   0          8m17s
@@ -320,17 +340,25 @@ statefulset.apps/primary-cluster-storage   2/2     8m19s
 
 ## Connect to the Demo App on the London OKE Cluster
 
+
+
+Now that he application is up and running it's time to try it out.
+
 The user interface of the Coherence Demo app is exposed as a NodePort service in Kubernetes, i.e. a port is exposed on the public IP address of every kubernetes worker node. Note that in a production scenario other choices are available for exposing the UI that might be more suitable! 
 
 List the public IP addresses of the worker nodes:
 
 ```
-$ kubectl get nodes -o wide
+kubectl get nodes -o wide
 ```
 
 The output will list the addresses under EXTERNAL-IP column, copy any one and enter the URL changing EXTERNAL_IP for a proper address: 
 
-http://*<EXTERNAL-IP*>:32636/application/index.html This will open the UI:
+```
+http://*<EXTERNAL-IP*>:32636/application/index.html 
+```
+
+This will open the UI.
 
 When the application comes up, you will need to close the information window by hitting the "Dont Show this Again" button.
 
@@ -338,7 +366,7 @@ When the application comes up, you will need to close the information window by 
 
 ## Scale the OKE Cluster
 
-The OKE cluster has been provisioned with two worker nodes, we will add a third worker node by scaling the cluster's only node pool. We will then scale our Coherence cluster to use the new compute capacity. 
+The OKE cluster has been provisioned with two worker nodes, we will add a third worker node by scaling the cluster's only node pool. We will then scale our Coherence application to use the new compute capacity. 
 
 Ensure you are still logged in to the OCI Console and on the London cluster's homepage. If you are not, as you did before access the hamburger in the top left hand corner then select "Developer Services" then "Kubernetes Clusters" and pick your assigned cluster form the list. In the resources menu on the left select Node Pools
 
@@ -375,7 +403,7 @@ Now that we've added more compute capacity to the Kubernetes cluster we will sca
 First check how the existing two pods of the storage cluster are distributed across the OKE worker nodes:
 
 ```
-$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
+kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
 ```
 
 This will show that the two pods are running on different worker nodes (different NODE ip's), the Coherence operator enforces anti-affinity. 
@@ -385,15 +413,15 @@ Now increase the replica count of the coherence storage cluster from 2 to 3. The
 Now apply the manifests again:
 
 ```
-$ cd ~/coherence-demo
+cd ~/coherence-demo
 
-$ helm upgrade primary-cluster --reuse-values --set replicas=3 ./primary-cluster-chart/ -n coherence-demo-ns
+helm upgrade primary-cluster --reuse-values --set replicas=3 ./primary-cluster-chart/ -n coherence-demo-ns
 ```
 
 Immediately check for the new node being added:
 
 ```
-$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
+kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
 You should see the new pod being added and transitioning to the Running state. Note the the pod is running on the new worker node.
@@ -403,22 +431,24 @@ In the application UI note that a new Coherence server is shown. The cache data 
 
 ![image-20200929173052997](image-20200929173052997.png) 
 
-The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes will be distributed across fault domains within each region to provide additional levels of redundancy. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
+The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes will be distributed across fault domains within each region to provide additional levels of redundancy tp our Coherence application. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
 
 ```
-$ kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oraclecloud.com/fault-domain
+kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oraclecloud.com/fault-domain
 ```
 
 This will print the availability domain and fault domain of each worker node.
+
+The [kubernetes zone label](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/#topologykubernetesiozone) is mapped to the OCI availability domain which means Kubernetes is aware of the topology of the OKE cluster. The Coherence operator uses this information to ensure that the cache server pods are placed to ensure maximum redundancy of cache data. 
 
 ## Recovery from Pod Failure
 
 We will now simulate a failure of a pod and observe Kubernetes automatic recovery. A pod in Kubernetes is the smallest depoyable unit and consists of one or more running containers. In our example the pods are managed by Kubernetes statefulsets which control an ordered set of pods each with a stable network identity, ideal for applications like Coherence. The Kubernetes controller maintains the number of pods in the statefulset at the number specified when deployed, the "desired state".
 
-In the Cloud Shell list the pods that constitute the storage cluster:
+In the Cloud Shell list the pods that constitute the storage role within our cluster i.e. the ones holding our data:
 
 ```
-$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
+kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
 NAME                        READY   STATUS    RESTARTS   AGE     IP             NODE        NOMINATED NODE   READINESS GATES
 primary-cluster-storage-0   1/1     Running   1          16h     10.244.0.168   10.0.10.2   <none>           <none>
 primary-cluster-storage-1   1/1     Running   0          2m59s   10.244.1.40    10.0.10.4   <none>           <none>
@@ -428,13 +458,13 @@ primary-cluster-storage-2   1/1     Running   1          15h     10.244.0.3     
 This shows that each pod is named "primary-cluster-storage-" followed by an ordinal, e.g. primary-cluster-storage-0. We will delete one of these pods. You will also be able to view the recovery from the demo applications UI so try and arrange your browser windows to show the UI alongside the Cloud Shell. To delete the pod issue the command:
 
 ```
-$ kubectl delete po primary-cluster-storage-0 -n coherence-demo-ns
+kubectl delete po primary-cluster-storage-0 -n coherence-demo-ns
 ```
 
-Immediately once this completes issue the command 
+Immediately (recovery is fast) once this completes issue the command 
 
 ```
-$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
+kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
 to view the pod being restarted by the Kubernetes controller. In many cases the restart will be very quick and you may see that the primary-cluster-storage-0 pod is already running but will show an AGE of a few seconds. The application's UI should show the number of coherence servers drop to two, the data being re-partitioned, then a third coherence server reappearing and then the data being re-partitioned again. 
@@ -452,7 +482,7 @@ Click Node Pools to view the single node pool:
 Select Scale and on the resulting screen change 3 nodes to 2 and press the blue Scale button. The last worker node to be added will be removed. Monitor the state of the application via the application's UI and also by running:
 
 ```
-$ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
+kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
 You should see that the number of pods is restored to 3 and the application rebalances the cache data as the number of cache servers drops and is then restored to the desired state. 
@@ -468,13 +498,13 @@ We will create a new Kubernetes namespace and then install the [Coherence Operat
 **Ensure that you are using the Frankfurt context in kubectl!!!**
 
 ```
-$ kubectl config use-context fra
+kubectl config use-context fra
 ```
 
 Create  new namespace to isolate the resources that are part of our lab, in the cloud shell terminal issue the command:
 
 ```
-$ kubectl create namespace coherence-demo-ns
+kubectl create namespace coherence-demo-ns
 ```
 
 Install the operator into our Frankfurt cluster:
@@ -495,38 +525,38 @@ The pod should show as being in the Running state. The operator is now ready to 
 
 We will deploy the second Coherence cluster in the Frankfurt OKE cluster. The manifest at *~/coherence-demo/secondary-cluster-chart/templates/secondary-cluster.yaml*  defines the storage Coherence cluster, the application cluster and the services that allow them to federate with the first cluster.
 
-Ensure that the environment variables are still valid. The following command should return **two** IP addresses:
+**Ensure that the environment variables are still valid, if cloud shell times out they will be lost.** The following command should return **two** IP addresses:
 
 ```
-$ env | grep CLUSTER_HOST
+env | grep CLUSTER_HOST
 PRIMARY_CLUSTER_HOST=111.99.111.89
 SECONDARY_CLUSTER_HOST=111.66.111.44
 ```
 
-If your cloudshell environment has timed out and reconnected the values may have been lost. To reinstate them issue the following commands:
+If your cloud shell environment has timed out and reconnected the values may have been lost. To reinstate them issue the following commands:
 
 ```
-$ kubectl config use-context lhr
+kubectl config use-context lhr
 
-$ export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
+export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
 
-$ kubectl config use-context fra
+kubectl config use-context fra
 
-$ export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
+export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
 ```
 
 Deploy the chart with helm:
 
 ```
-$ cd ~/coherence-demo
+cd ~/coherence-demo
 
-$ helm install secondary-cluster --set primaryclusterhost=$PRIMARY_CLUSTER_HOST --set secondaryclusterhost=$SECONDARY_CLUSTER_HOST ./secondary-cluster-chart/ -n coherence-demo-ns
+helm install secondary-cluster --set primaryclusterhost=$PRIMARY_CLUSTER_HOST --set secondaryclusterhost=$SECONDARY_CLUSTER_HOST ./secondary-cluster-chart/ -n coherence-demo-ns
 ```
 
 Check that the custom resources have been created:
 
 ```
-$ kubectl get coherence -n coherence-demo-ns
+kubectl get coherence -n coherence-demo-ns
 NAME                        CLUSTER             ROLE      REPLICAS   READY   PHASE
 secondary-cluster-http      secondary-cluster   http      1                  Created
 secondary-cluster-storage   secondary-cluster   storage   2                  Created
@@ -536,7 +566,7 @@ Check that all the underlying pods are in the Running state.
 Wait until you see output similar to that below which will mean everything is running.
 
 ```
-$ kubectl get po -n coherence-demo-ns
+kubectl get po -n coherence-demo-ns
 NAME                                  READY   STATUS    RESTARTS   AGE
 coherence-operator-845c87bd5f-dtjxm   1/1     Running   4          3d22h
 secondary-cluster-http-0              1/1     Running   0          2m7s
@@ -547,7 +577,7 @@ secondary-cluster-storage-1           1/1     Running   0          2m7s
 Open the UI for the secondary application. First identify the public IP of the worker nodes in the Frankfurt OKE cluster:
 
 ```
-$ kubectl get nodes -o wide
+kubectl get nodes -o wide
 ```
 
 Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :31715/application/index.html. The UI should open for the application running in Frankfurt. Note that the UI shows that this cluster is empty and contains no trades. 
@@ -593,4 +623,16 @@ View the secondary Coherence cluster UI and verify that these changes are also b
 
 Note that in this example we are federating our Coherence clusters across the public Internet, probably not ideal in a real world scenario! A better choices for more realistic deployments would be to connect the two regions with an OCI [remote peering gateway](https://docs.cloud.oracle.com/en-us/iaas/Content/Network/Tasks/remoteVCNpeering.htm) which could connect the two regions without traversing the internet.
 
- 
+## Congratulations
+
+Congratulations! You've successfully completed the lab, installing the Coherence Operator on two OKE clusters and using it to run a Coherence demo application in Kubernetes. 
+
+### Further Information
+
+Some more details on Coherence, OCI and OKE can be found in the resources below. 
+
+Coherence Medium Channel: https://medium.com/oracle-coherence
+
+Overview of Coherence Operator v3: https://medium.com/oracle-coherence/coherence-operator-3-released-cbfd01bc56c7
+
+Open Source Coherence CE: https://github.com/oracle/coherence
