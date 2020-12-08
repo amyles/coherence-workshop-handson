@@ -66,14 +66,14 @@ First press the "Launch Cloud Shell" button, after a few moments a terminal will
 
 Then copy the oci cli command listed in step 2 into your cloud shell prompt. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config in your cloud shell. 
 
-Copy the oci cli command from the OCI console dialog and paste it into the cloud shell prompt. For example (example only, do not copy):
+Copy the oci cli command from the OCI console dialog and paste it into the cloud shell prompt. For example (**example only, do not copy**):
 
 ```
 $ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-Check that the context is available by typing the command below (kubectl config get-contexts) :
+Check that the context is available by typing the command below :
 
 ```
 kubectl config get-contexts
@@ -89,7 +89,7 @@ Copy the name of the new context that begins with "context" and then a hyphen an
 $ kubectl config rename-context context-whatyoursiscalled fra
 Context "context-whatyoursiscalled" renamed to "fra".
 ```
-Run the kubectl config get-contexts again and you will see the change has been made.
+Run the kubectl config get-contexts again and you will see the name change has been made.
 
 You should now be able to query your OKE cluster by using the following kubectl command:
 
@@ -180,7 +180,9 @@ You should now be able to query your OKE cluster by running using the following 
 kubectl get nodes -o wide
 ```
 
-You should see that the London OKE cluster has three worker nodes. We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
+You should see that the London OKE cluster has three worker nodes. 
+
+We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
 
 ```
 export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
@@ -340,11 +342,9 @@ statefulset.apps/primary-cluster-storage   2/2     8m19s
 
 ## Connect to the Demo App on the London OKE Cluster
 
-
-
 Now that he application is up and running it's time to try it out.
 
-The user interface of the Coherence Demo app is exposed as a NodePort service in Kubernetes, i.e. a port is exposed on the public IP address of every kubernetes worker node. Note that in a production scenario other choices are available for exposing the UI that might be more suitable! 
+The user interface of the Coherence Demo app is exposed as a NodePort service in Kubernetes, i.e. a port is exposed on the public IP address of every kubernetes worker node. Note that in a production scenario other choices are available for exposing the UI that might be more suitable! Similarly having worker nodes with public IPs is also not a common choice for a production scenario, other choices are available! 
 
 List the public IP addresses of the worker nodes:
 
@@ -437,7 +437,7 @@ Immediately (recovery is fast) once this completes issue the command
 kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
-to view the pod being restarted by the Kubernetes controller. In many cases the restart will be very quick and you may see that the primary-cluster-storage-0 pod is already running but will show an AGE of a few seconds. The application's UI should show the number of coherence servers drop to two, the data being re-partitioned, then a third coherence server reappearing and then the data being re-partitioned again. 
+to view the pod being restarted by the Kubernetes controller. In many cases the restart will be very quick and you may see that the primary-cluster-storage-0 pod is already running but will show an AGE of a few seconds. The application's UI should show the number of coherence servers drop to two, the data being re-partitioned to ensure every cache entry has a primary and backup copy on different cache servers, then a third coherence server reappearing and then the data being re-partitioned again. Ctrl-C to exit the command. 
 
 ## Recovery from Node Failure
 
