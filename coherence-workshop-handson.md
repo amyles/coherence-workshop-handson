@@ -607,4 +607,5 @@ Overview of Coherence Operator v3: https://medium.com/oracle-coherence/coherence
 
 Open Source Coherence CE: https://github.com/oracle/coherence
 
-Oracle Coherence YouTube Channel: https://www.youtube.com/user/OracleCoherence
+Oracle Kubernetes Engine: https://www.oracle.com/uk/cloud-native/container-engine-kubernetes/
+
