@@ -97,7 +97,7 @@ You should now be able to query your OKE cluster by using the following kubectl 
 kubectl get nodes -o wide
 ```
 
-If this is successful and you see your workers nodes with a STATUS of 'Ready'. Please close the 'Access Your Cluster' Window.
+If this is successful and you see two worker nodes with a STATUS of 'Ready' in the Frankfurt cluster. These worker nodes are where we will deploy our Coherence application. Please close the 'Access Your Cluster' Window.
 
 We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
 
@@ -180,7 +180,7 @@ You should now be able to query your OKE cluster by running using the following 
 kubectl get nodes -o wide
 ```
 
-We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
+You should see that the London OKE cluster has three worker nodes. We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
 
 ```
 export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
@@ -194,11 +194,11 @@ Check that you have the correct values:
 env | grep CLUSTER_HOST
 ```
 
-This command should return two **different** IP addresses! One from the lhr cluster and one from the fra cluster. 
+This command should return two **different** IP addresses, one from the lhr cluster and one from the fra cluster!
 
 ## Prepare the London Cluster for Coherence
 
-We will create a new Kubernetes namespace and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our London cluster. 
+We will create a new Kubernetes namespace to hold all of our resources and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our London cluster. 
 
 **Ensure that you are using the London context in kubectl!!!**
 
@@ -218,7 +218,7 @@ Then add the Coherence Operator helm chart repo to the local, pre-installed helm
 $ helm repo add coherence https://oracle.github.io/coherence-operator/charts
 ```
 
-Then update the local repos:
+Then update the local helm repos so we will have the latest version available:
 
 ```
 helm repo update
@@ -364,41 +364,11 @@ When the application comes up, you will need to close the information window by 
 
 ![image-20200929152901818](image-20200929152901818.png)
 
-## Scale the OKE Cluster
-
-The OKE cluster has been provisioned with two worker nodes, we will add a third worker node by scaling the cluster's only node pool. We will then scale our Coherence application to use the new compute capacity. 
-
-Ensure you are still logged in to the OCI Console and on the London cluster's homepage. If you are not, as you did before access the hamburger in the top left hand corner then select "Developer Services" then "Kubernetes Clusters" and pick your assigned cluster form the list. In the resources menu on the left select Node Pools
-
- ![Screenshot from 2020-09-29 16-16-16](Screenshot%20from%202020-09-29%2016-16-16.png)
-
-On the subsequently displayed node pool click on pool1 to see the pool details.
-
-![Screenshot from 2020-09-29 16-22-47](Screenshot%20from%202020-09-29%2016-22-47.png)
-
-Click scale to change the number of worker nodes from 2 to 3. This will cause a new virtual machine to be provisioned, the kubernetes software to be installed and joined to the OKE cluster. 
-
-![image-20200929162615227](image-20200929162615227.png)
-
-Change number of nodes to 3 and press the blue Scale button. 
-
-Back in the Cloud Shell issue the following command to see the new node being added:
-
-```
-kubectl get nodes -w
-```
-
-The -w flag will cause the command to wait until the new node is added. This usually takes a few *minutes* so this is a good point to have a tea break! 
-
-Once the new node is added stop the command with ^c. Check  you have three nodes in the ready state with:
-
-```
-kubectl get nodes
-```
+Spend some time exploring the application. The UI shows the two cache servers and the 100,000 trades that are held in memory. 
 
 ## Scale the Coherence Cluster
 
-Now that we've added more compute capacity to the Kubernetes cluster we will scale our Coherence cluster. 
+The London OKE cluster is built with three Kubernetes worker nodes. Our Coherence application has three pods in total. One pod is running the UI this is the "http" role in our yaml files. The other two pods belong to the "storage" role and are where our cache data is stored.
 
 First check how the existing two pods of the storage cluster are distributed across the OKE worker nodes:
 
@@ -406,9 +376,9 @@ First check how the existing two pods of the storage cluster are distributed acr
 kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage
 ```
 
-This will show that the two pods are running on different worker nodes (different NODE ip's), the Coherence operator enforces anti-affinity. 
+This will show that the two pods are running on different worker nodes (different NODE ip's), the Coherence operator enforces anti-affinity. This is the minimum footprint that will allow Coherence to store the primary object on one node and keep it's backup on a separate node.
 
-Now increase the replica count of the coherence storage cluster from 2 to 3. There are many ways to do this but we will upgrade the helm chart and set the replicas to 3.
+Now increase the replica count of the coherence storage role from 2 to 3, adding one more storage enabled Coherence cache server. There are many ways to do this but we will upgrade the helm chart and set the replicas to 3.
 
 Now apply the manifests again:
 
@@ -431,7 +401,7 @@ In the application UI note that a new Coherence server is shown. The cache data 
 
 ![image-20200929173052997](image-20200929173052997.png) 
 
-The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes will be distributed across fault domains within each region to provide additional levels of redundancy tp our Coherence application. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
+The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes beyond the three we have already will be distributed across fault domains within each region to provide additional levels of redundancy to our Coherence application. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
 
 ```
 kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oraclecloud.com/fault-domain
@@ -587,14 +557,14 @@ Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new b
 Switch to the application UI for the first, London cluster. If you do not have the URL then switch contexts to lhr:
 
 ```
-$ kubectl config use-context lhr
+kubectl config use-context lhr
 Switched to context "lhr".
 ```
 
 Then get one of the public IPs of the London cluster:
 
 ```
-$ kubectl get nodes -o wide
+kubectl get nodes -o wide
 ```
 
 Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :32636/application/index.html. The UI should open for the application running in London. 
@@ -636,3 +606,5 @@ Coherence Medium Channel: https://medium.com/oracle-coherence
 Overview of Coherence Operator v3: https://medium.com/oracle-coherence/coherence-operator-3-released-cbfd01bc56c7
 
 Open Source Coherence CE: https://github.com/oracle/coherence
+
+Oracle Coherence YouTube Channel: https://www.youtube.com/user/OracleCoherence
