@@ -18,13 +18,11 @@ Details of the two Oracle Container Engine (OKE) clusters that will be used for 
 
 Our first task will be to connect to Oracle's Cloud Infrastructure for the first time and locate the resources we be using throughout the lab.
 
-This lab will use two OKE clusters, one in the London region and the other in the Frankfurt region. We will interact with the OKE clusters via standard Kubernetes tools like [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) and [helm](https://helm.sh/). Fortunately OCI provides a [Cloud Shell](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellintro.htm) environment with these tools already installed that we can use as a virtual bastion host. 
+This lab will use two OKE clusters, one in the Ashburn region and the other in the Phoenix region. We will interact with the OKE clusters via standard Kubernetes tools like [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) and [helm](https://helm.sh/). Fortunately OCI provides a [Cloud Shell](https://docs.cloud.oracle.com/en-us/iaas/Content/API/Concepts/cloudshellintro.htm) environment with these tools already installed that we can use as a virtual bastion host. 
 
-To get started locate the OCI username and password assigned to you and open the OCI Console at https://console.uk-london-1.oraclecloud.com/ and enter the tenancy name. Your username, one time password and tenancy will be listed in the student guide.
+To get started locate the OCI username and password assigned to you and open the OCI Console at [https://console.us-phoenix-1.oraclecloud.com/](https://console.us-phoenix-1.oraclecloud.com/) and enter the tenancy name. Your username, one time password and tenancy will be listed in the student guide.
 
-![image-20201027111619204](image-20201027111619204.png)
-
-
+![image-20210108152054578](image-20210108152054578.png)
 
 Select Continue and then enter the username and password issued to you on the **right hand side** of the log in screen:
 
@@ -34,21 +32,19 @@ Press sign in.
 
 Note: You will be prompted to enter a new password, pick something memorable.
 
-## Establish Access to Frankfurt Cluster
+## Establish Access to Phoenix Cluster
 
-We'll work against the OKE cluster in Franfurt first. Switch to the Frankfurt region using the region chooser in the grey bar at the top of the screen. 
+We'll work against the OKE cluster in Phoenix first. Switch to the Phoenix region using the region chooser in the grey bar at the top of the screen. 
 
-![Screenshot from 2020-10-02 10-52-18](Screenshot%20from%202020-10-02%2010-52-18.png)
+![](ociconsole.jpg)
 
-
-
-We will now configure kubectl in cloud shell to work with the Frankfurt OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
+We will now configure kubectl in cloud shell to work with the Phoenix OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
 
 ![image-20201002125651445](image-20201002125651445.png)
 
 
 
-Once in the Frankfurt region ensure you are in the specified compartment. Resources in OCI are isolated in "[compartments](https://docs.cloud.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcompartments.htm#Working)" . Your resources will be in a sub-compartment of **coherence_ws** named **coherence_userN_ws** where N is your student number. You can use the compartment chooser on the left hand side to switch, either by selecting it explicitly or by typing to narrow down the selection:
+Once in the Phoenix region ensure you are in the specified compartment. Resources in OCI are isolated in "[compartments](https://docs.cloud.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcompartments.htm#Working)" . Your resources will be in a sub-compartment of **coherence_ws** named **coherence_userN_ws** where N is your student number. You can use the compartment chooser on the left hand side to switch, either by selecting it explicitly or by typing to narrow down the selection:
 
 ![image-20201207154345271](image-20201207154345271.png)
 
@@ -64,12 +60,12 @@ Configuring kubectl is a case of just following the instructions on the screen.
 
 First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. 
 
-Then copy the oci cli command listed in step 2 into your cloud shell prompt. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config in your cloud shell. 
+Then copy the oci cli command listed in step 2 into your new cloud shell prompt. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed. The command will copy the kube config file to the standard location at ~/.kube/config in your cloud shell. 
 
-Copy the oci cli command from the OCI console dialog and paste it into the cloud shell prompt. For example (**example only, do not copy**):
+Copy the oci cli command from the OCI console dialog and paste it into the cloud shell prompt. E.g. (**example only, do <u>not</u> copy**):
 
 ```
-$ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
+$ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-phoenix-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-phoenix-1 --token-version 2.0.0 
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
@@ -81,13 +77,13 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
 *         context-whatyoursiscalled   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
 ```
 
-For ease of use we will rename the new kubectl context you created to **fra**. 
+For ease of use we will rename the new kubectl context you created to **phx**. 
 
 Copy the name of the new context that begins with "context" and then a hyphen and a GIUD from the output of the previous command  and replace it in the command example below. 
 
 ```
-$ kubectl config rename-context context-whatyoursiscalled fra
-Context "context-whatyoursiscalled" renamed to "fra".
+$ kubectl config rename-context context-whatyoursiscalled phx
+Context "context-whatyoursiscalled" renamed to "phx".
 ```
 Run the kubectl config get-contexts again and you will see the name change has been made.
 
@@ -97,9 +93,9 @@ You should now be able to query your OKE cluster by using the following kubectl 
 kubectl get nodes -o wide
 ```
 
-If this is successful and you see two worker nodes with a STATUS of 'Ready' in the Frankfurt cluster. These worker nodes are where we will deploy our Coherence application. Please close the 'Access Your Cluster' Window.
+If this is successful and you see two worker nodes with a STATUS of 'Ready' in the Phoenix cluster. These worker nodes are where we will deploy our Coherence application. Please close the 'Access Your Cluster' Window.
 
-We will create an environment variable whose value is the IP address of one of the nodes in the Frankfurt cluster for use later on when deploying our Coherence application. 
+We will create an environment variable whose value is the IP address of one of the nodes in the Phoenix cluster for use later on when deploying our Coherence application. 
 
 Copy end enter the 2 commands below into your cloud shell.
 
@@ -109,17 +105,17 @@ export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk
 echo $SECONDARY_CLUSTER_HOST
 ```
 
-## Establish Access to London Cluster
+## Establish Access to Ashburn Cluster
 
 We now need to carry out the same steps in our other OKE cluster.
 
-Switch to the London region using the region chooser in the grey bar at the top of the screen. 
+Switch to the Ashburn region using the region chooser in the grey bar at the top of the screen. 
 
-![Screenshot from 2020-10-27 11-29-08](Screenshot%20from%202020-10-27%2011-29-08.png)
+![](ociconsole2.jpg)
 
 
 
-We will now configure kubectl in cloud shell to work with the London OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
+We will now configure kubectl in cloud shell to work with the Ashburn OKE cluster. Click on the "hamburger" icon in the top left to open the services menu and locate "Developer Services" and then the "Kubernetes Clusters".
 
 ![image-20200929084456958](image-20200929084456958.png)
 
@@ -133,45 +129,45 @@ On the OKE clusters homepage locate the cluster assigned to you. Ensure you are 
 
 Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command from step 2 and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed.
 
-For **example** (do not cut & paste):
+E.g. (**do <u>not</u> cut & paste**):
 
 ```
-$ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-frankfurt-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region eu-frankfurt-1 --token-version 2.0.0 
+$ oci ce cluster create-kubeconfig --cluster-id ocid1.cluster.oc1.eu-phoenix-1.aaaaaaaaafsdqnlegm2dczbqmvqtinjxg4ztozjrge4wczdcmc3gcmzqgrrd --file $HOME/.kube/config --region us-phoenix-1 --token-version 2.0.0 
 Existing Kubeconfig file found at /home/your_user/.kube/config and new config merged into it
 ```
 
-This will copy the new cluster's kubeconfig file and merge it with the existing file at ~/.kube/config which already contained the config for the Frankfurt cluster. Check that there are now two contexts available by running the following:
+This will copy the new cluster's kubeconfig file and merge it with the existing file at ~/.kube/config which already contained the config for the Phoenix cluster. Check that there are now two contexts available by running the following:
 
 ```
 kubectl config get-contexts
 CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
 *         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
-          fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
+          phx                   cluster-cqtsyzvge2w   user-cqtsyzvge2w
 ```
 
 You can now close the "Access Your Cluster" window.
 
-We will now rename the new context created to allow us to easily switch between the London and Frankfurt clusters later in the lab. Query the current context with the command:
+We will now rename the new context created to allow us to easily switch between the Ashburn and Phoenix clusters later in the lab. Query the current context with the command:
 
 ```
 kubectl config get-contexts
 CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
 *         context-c3gcmzqgrrd   cluster-c3gcmzqgrrd   user-c3gcmzqgrrd   
-          fra                   cluster-cqtsyzvge2w   user-cqtsyzvge2w 
+          phx                   cluster-cqtsyzvge2w   user-cqtsyzvge2w 
 ```
 
-Rename the new London context to **lhr** which should prove to be a little more memorable!
+Rename the new Ashburn context to **ash** which should prove to be a little more memorable!
 The following command will need to reflect the context name returned from the command above in your environment:
 
 ```
-kubectl config rename-context context-<whatyourswascalled> lhr
-Context "context-<whatyourswascalled>" renamed to "lhr".
+kubectl config rename-context context-<whatyourswascalled> ash
+Context "context-<whatyourswascalled>" renamed to "ash".
 ```
 
-Switch to the new **lhr** context
+Switch to the new **ash** context
 
 ```
-kubectl config use-context lhr
+kubectl config use-context ash
 ```
 
 You should now be able to query your OKE cluster by running using the following kubectl command in the cloud shell window:
@@ -180,9 +176,9 @@ You should now be able to query your OKE cluster by running using the following 
 kubectl get nodes -o wide
 ```
 
-You should see that the London OKE cluster has three worker nodes. 
+You should see that the Ashburn OKE cluster has three worker nodes. 
 
-We will create an environment variable whose value is the IP address of one of the nodes in the London cluster for use later on when deploying our Coherence application. 
+We will create an environment variable whose value is the IP address of one of the nodes in the Ashburn cluster for use later on when deploying our Coherence application. 
 
 ```
 export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
@@ -196,16 +192,16 @@ Check that you have the correct values:
 env | grep CLUSTER_HOST
 ```
 
-This command should return two **different** IP addresses, one from the lhr cluster and one from the fra cluster!
+This command should return two **different** IP addresses, one from the ash cluster and one from the phx cluster!
 
-## Prepare the London Cluster for Coherence
+## Prepare the Ashburn Cluster for Coherence
 
-We will create a new Kubernetes namespace to hold all of our resources and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our London cluster. 
+We will create a new Kubernetes namespace to hold all of our resources and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our Ashburn cluster. 
 
-**Ensure that you are using the London context in kubectl!!!**
+**Ensure that you are using the Ashburn context in kubectl!!!**
 
 ```
-$ kubectl config use-context lhr
+$ kubectl config use-context ash
 ```
 
 Create a new Kubernetes namespace to isolate the resources that are part of our lab, in the cloud shell terminal issue the command:
@@ -226,7 +222,7 @@ Then update the local helm repos so we will have the latest version available:
 helm repo update
 ```
 
-Install the operator into our London cluster:
+Install the operator into our Ashburn cluster:
 
 ```
 helm install coherence-operator --namespace coherence-demo-ns coherence/coherence-operator
@@ -242,7 +238,7 @@ The pod should show as being in the Running state. The operator is now ready to 
 
 ## Deploy the primary Coherence cluster 
 
-We will deploy the first Coherence cluster in the London OKE cluster. A pre-built manifest file defines all the resources needed to run a Coherence cluster for object storage and another, storage-disabled Coherence cluster for the user interface. The manifests are stored in a git repo that can be cloned in Cloud Shell and then deployed. Clone the repo:
+We will deploy the first Coherence cluster in the Ashburn OKE cluster. A pre-built manifest file defines all the resources needed to run a Coherence cluster for object storage and another, storage-disabled Coherence cluster for the user interface. The manifests are stored in a git repo that can be cloned in Cloud Shell and then deployed. Clone the repo:
 
 ```
 git clone https://gitlab.osc-cloud.com/coherence-workshop/coherence-demo.git
@@ -283,7 +279,7 @@ image: lhr.ocir.io/oscemea001/coherence/coherence-demo:4.0.0-SNAPSHOT
 
 Press "q" to exit viewing the manifest.
 
-Deploy the primary Coherence cluster to the London OKE cluster using helm:
+Deploy the primary Coherence cluster to the Ashburn OKE cluster using helm:
 
 ```
 cd ~/coherence-demo/
@@ -340,7 +336,7 @@ statefulset.apps/primary-cluster-http      1/1     8m18s
 statefulset.apps/primary-cluster-storage   2/2     8m19s
 ```
 
-## Connect to the Demo App on the London OKE Cluster
+## Connect to the Demo App on the Ashburn OKE Cluster
 
 Now that he application is up and running it's time to try it out.
 
@@ -368,7 +364,7 @@ Spend some time exploring the application. The UI shows the two cache servers an
 
 ## Scale the Coherence Cluster
 
-The London OKE cluster is built with three Kubernetes worker nodes. Our Coherence application has three pods in total. One pod is running the UI this is the "http" role in our yaml files. The other two pods belong to the "storage" role and are where our cache data is stored.
+The Ashburn OKE cluster is built with three Kubernetes worker nodes. Our Coherence application has three pods in total. One pod is running the UI this is the "http" role in our yaml files. The other two pods belong to the "storage" role and are where our cache data is stored.
 
 First check how the existing two pods of the storage cluster are distributed across the OKE worker nodes:
 
@@ -401,7 +397,7 @@ In the application UI note that a new Coherence server is shown. The cache data 
 
 ![image-20200929173052997](image-20200929173052997.png) 
 
-The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the London region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes beyond the three we have already will be distributed across fault domains within each region to provide additional levels of redundancy to our Coherence application. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
+The primary OKE cluster has been built so that it's worker nodes lie across all three [availability domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm) of the Ashburn region. Availability domains are isolated from each other, fault tolerant, and very unlikely to fail simultaneously. Because availability domains do not share infrastructure such as power or cooling, or the internal availability domain network, a failure at one availability domain within a region is unlikely to impact the availability of the others within the same region. Each availability domain has three [fault domains](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm#fault). A fault domain is a grouping of hardware and infrastructure within an availability domain. Additional OKE worker nodes beyond the three we have already will be distributed across fault domains within each region to provide additional levels of redundancy to our Coherence application. To see how the OKE worker nodes are distributed across the OCI infrastructure issue the following command:
 
 ```
 kubectl get nodes -o wide -L failure-domain.beta.kubernetes.io/zone,oci.oraclecloud.com/fault-domain
@@ -441,7 +437,7 @@ to view the pod being restarted by the Kubernetes controller. In many cases the 
 
 ## Recovery from Node Failure
 
-We will now remove a worker node from the Kubernetes cluster and observe how Kubernetes maintains our Coherence cluster at three servers. Locate the London OKE cluster homepage in the OCI console. 
+We will now remove a worker node from the Kubernetes cluster and observe how Kubernetes maintains our Coherence cluster at three servers. Locate the Ashburn OKE cluster homepage in the OCI console. 
 
 ![Screenshot from 2020-09-29 16-16-16](Screenshot%20from%202020-09-29%2016-16-16-1601451821972.png)
 
@@ -459,16 +455,16 @@ You should see that the number of pods is restored to 3 and the application reba
 
 ## Cache Federation Across OCI Regions
 
-Oracle Cloud Infrastructure is available globally through [regions](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm). In the second part of this exercise we will use the federation features of Coherence to show how a federated cache can be distributed across these regions to allow clients to be geographically local to their cache data. A second OKE cluster has been provisioned in the Frankfurt region. We will deploy the sample application to this new Kubernetes cluster and enable the bi-directional federation of data between them. 
+Oracle Cloud Infrastructure is available globally through [regions](https://docs.cloud.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm). In the second part of this exercise we will use the federation features of Coherence to show how a federated cache can be distributed across these regions to allow clients to be geographically local to their cache data. A second OKE cluster has been provisioned in the Phoenix region. We will deploy the sample application to this new Kubernetes cluster and enable the bi-directional federation of data between them. 
 
-## Prepare the Frankfurt Cluster for Coherence
+## Prepare the Phoenix Cluster for Coherence
 
-We will create a new Kubernetes namespace and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our Frankfurt cluster. 
+We will create a new Kubernetes namespace and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our Phoenix cluster. 
 
-**Ensure that you are using the Frankfurt context in kubectl!!!**
+**Ensure that you are using the Phoenix context in kubectl!!!**
 
 ```
-kubectl config use-context fra
+kubectl config use-context phx
 ```
 
 Create  new namespace to isolate the resources that are part of our lab, in the cloud shell terminal issue the command:
@@ -477,7 +473,7 @@ Create  new namespace to isolate the resources that are part of our lab, in the 
 kubectl create namespace coherence-demo-ns
 ```
 
-Install the operator into our Frankfurt cluster:
+Install the operator into our Phoenix cluster:
 
 ```
 helm install coherence-operator --namespace coherence-demo-ns coherence/coherence-operator
@@ -493,7 +489,7 @@ The pod should show as being in the Running state. The operator is now ready to 
 
 ## Deploy the secondary Coherence cluster 
 
-We will deploy the second Coherence cluster in the Frankfurt OKE cluster. The manifest at *~/coherence-demo/secondary-cluster-chart/templates/secondary-cluster.yaml*  defines the storage Coherence cluster, the application cluster and the services that allow them to federate with the first cluster.
+We will deploy the second Coherence cluster in the Phoenix OKE cluster. The manifest at *~/coherence-demo/secondary-cluster-chart/templates/secondary-cluster.yaml*  defines the storage Coherence cluster, the application cluster and the services that allow them to federate with the first cluster.
 
 **Ensure that the environment variables are still valid, if cloud shell times out they will be lost.** The following command should return **two** IP addresses:
 
@@ -506,11 +502,11 @@ SECONDARY_CLUSTER_HOST=111.66.111.44
 If your cloud shell environment has timed out and reconnected the values may have been lost. To reinstate them issue the following commands:
 
 ```
-kubectl config use-context lhr
+kubectl config use-context ash
 
 export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
 
-kubectl config use-context fra
+kubectl config use-context phx
 
 export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
 ```
@@ -544,30 +540,30 @@ secondary-cluster-storage-0           1/1     Running   0          2m7s
 secondary-cluster-storage-1           1/1     Running   0          2m7s
 ```
 
-Open the UI for the secondary application. First identify the public IP of the worker nodes in the Frankfurt OKE cluster:
+Open the UI for the secondary application. First identify the public IP of the worker nodes in the Phoenix OKE cluster:
 
 ```
 kubectl get nodes -o wide
 ```
 
-Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :31715/application/index.html. The UI should open for the application running in Frankfurt. Note that the UI shows that this cluster is empty and contains no trades. 
+Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :31715/application/index.html. The UI should open for the application running in Phoenix. Note that the UI shows that this cluster is empty and contains no trades. 
 
 ![image-20201002151745946](image-20201002151745946.png)
 
-Switch to the application UI for the first, London cluster. If you do not have the URL then switch contexts to lhr:
+Switch to the application UI for the first, Ashburn cluster. If you do not have the URL then switch contexts to ash:
 
 ```
-kubectl config use-context lhr
-Switched to context "lhr".
+kubectl config use-context ash
+Switched to context "ash".
 ```
 
-Then get one of the public IPs of the London cluster:
+Then get one of the public IPs of the Ashburn cluster:
 
 ```
 kubectl get nodes -o wide
 ```
 
-Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :32636/application/index.html. The UI should open for the application running in London. 
+Note down one of the IP addresses listed in the EXTERNAL-IP column. Open a new browser and paste the IP in and append :32636/application/index.html. The UI should open for the application running in Ashburn. 
 
 ![image-20201002152541077](image-20201002152541077.png)
 
