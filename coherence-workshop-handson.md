@@ -99,7 +99,7 @@ Please close the 'Access Your Cluster' Window.
 
 We will create an environment variable whose value is the IP address of one of the nodes in the Phoenix cluster for use later on when deploying our Coherence application. 
 
-Copy end enter the 2 commands below into your cloud shell.
+Copy and enter the 2 commands below into your cloud shell.
 
 ```
 export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
