@@ -458,6 +458,8 @@ Select Scale and on the resulting screen change 3 nodes to 2 and press the blue 
 kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
+PLEASE Do NOT refresh the browser window to see node pool scaling progress as this will reset your cloud shell session environment variables.
+
 You should see that the number of pods is restored to 3 and the application rebalances the cache data as the number of cache servers drops and is then restored to the desired state. 
 
 ## Cache Federation Across OCI Regions
