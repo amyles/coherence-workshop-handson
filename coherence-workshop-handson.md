@@ -199,6 +199,8 @@ env | grep CLUSTER_HOST
 
 This command should return two **different** IP addresses, one from the ash cluster and one from the phx cluster!
 
+You can now close the 'Access Your Cluster' window.
+
 ## Prepare the Ashburn Cluster for Coherence
 
 We will create a new Kubernetes namespace to hold all of our resources and then install the [Coherence Operator](https://github.com/oracle/coherence-operator) into our Ashburn cluster. 
