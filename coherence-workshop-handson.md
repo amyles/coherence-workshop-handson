@@ -93,7 +93,9 @@ You should now be able to query your OKE cluster by using the following kubectl 
 kubectl get nodes -o wide
 ```
 
-If this is successful and you see two worker nodes with a STATUS of 'Ready' in the Phoenix cluster. These worker nodes are where we will deploy our Coherence application. Please close the 'Access Your Cluster' Window.
+If this is successful and you see two worker nodes with a STATUS of 'Ready' in the Phoenix cluster. These worker nodes are where we will deploy our Coherence application. 
+
+Please close the 'Access Your Cluster' Window.
 
 We will create an environment variable whose value is the IP address of one of the nodes in the Phoenix cluster for use later on when deploying our Coherence application. 
 
