@@ -125,11 +125,14 @@ We will now configure kubectl in cloud shell to work with the Ashburn OKE cluste
 
 On the OKE clusters homepage locate the cluster assigned to you. Ensure you are in the correct compartment as specified in the student details by checking the compartment drop down in the left of the screen. Click your assigned OKE cluster to view it's details. 
 
+As you did for the first cluster, press the 'Access Cluster' blue button.
+
 ![image-20200929090516869](image-20200929090516869.png)
 
 
+Configuring kubectl is a case of just following the instructions on the screen. Your Cloud Shell should still be open from the previous step and so go to step 2 on the window. 
 
-Configuring kubectl is a case of just following the instructions on the screen. First press the "Launch Cloud Shell" button, after a few moments a terminal will launch at the bottom of your browser window. Then copy the oci cli command from step 2 and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed.
+Copy the oci cli command from step 2 and paste it into the cloud shell terminal. Your cloud shell is pre-authenticated against your OCI account so no credentials are needed.
 
 E.g. (**do <u>not</u> cut & paste**):
 
