@@ -265,7 +265,7 @@ Review the manifests for the primary cluster:
 less ~/coherence-demo/primary-cluster-chart/templates/primary-cluster.yaml
 ```
 
-The manifest defines two Coherence clusters, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will take care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file, the Operator has made Kubernetes aware of the application constructs of Coherence.
+The manifest defines two roles within a Coherence cluster, one for storage and one for the user interface. Note that the Kind of the resource is "Coherence". This is a CRD or custom resource definition that is intercepted by the Coherence Operator previously deployed, the operator will take care of creating all the required Kubernetes resources; pods, statefulsets, services, persistent volumes, etc. Note that it covers aspects familiar to a Coherence user such as JVM args and cache config file, the Operator has made Kubernetes aware of the application constructs of Coherence.
 
 NOTE: It is possible to Maximise the Cloud Shell window in order to make looking at the file a little easier.
 
