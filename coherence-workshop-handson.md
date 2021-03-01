@@ -22,11 +22,17 @@ This lab will use two OKE clusters, one in the Ashburn region and the other in t
 
 To get started locate the OCI username and password assigned to you and open the OCI Console at [https://console.us-phoenix-1.oraclecloud.com/](https://console.us-phoenix-1.oraclecloud.com/) and enter the tenancy name. Your username, one time password and tenancy will be listed in the student guide.
 
-![image-20210108152054578](image-20210108152054578.png)
+![image-20210225103703644](image-20210225103703644.png)
 
-Select Continue and then enter the username and password issued to you on the **right hand side** of the log in screen:
+Then expand the down arrow to the right of “Oracle Cloud Infrastructure Direct Sign-In”:
 
-![image-20201027112259473](image-20201027112259473.png)
+![img](image-20210225103908210.png)
+
+This will reveal the OCI IAM native user log in form:
+
+![image-20210225104022010](image-20210225104022010.png)
+
+Enter the username and password provided to you:![image-20210225104812587](image-20210225104812587.png)
 
 Press sign in. 
 
@@ -300,7 +306,7 @@ Check the chart has been installed OK, this command should show that the applica
 helm ls -n coherence-demo-ns
 ```
 
-To check the state of the Coherence cluster issue the command which queries for the custom resource definition (CRD) for the Coherence clusters:
+To check the state of the Coherence cluster issue the command which queries for the custom resource definition (CRD) for the Coherence roles, "http" and "storage". These resources will quickly transition to the "Ready" phase:
 
 ```
 kubectl get coherence -n coherence-demo-ns
@@ -391,7 +397,7 @@ cd ~/coherence-demo
 helm upgrade primary-cluster --reuse-values --set replicas=3 ./primary-cluster-chart/ -n coherence-demo-ns
 ```
 
-Immediately check for the new node being added:
+Immediately check for the new node being added. This command will print out changes to the pods as they start, use ctrl C to exit:
 
 ```
 kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
@@ -440,7 +446,7 @@ Immediately (recovery is fast) once this completes issue the command
 kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 ```
 
-to view the pod being restarted by the Kubernetes controller. In many cases the restart will be very quick and you may see that the primary-cluster-storage-0 pod is already running but will show an AGE of a few seconds. The application's UI should show the number of coherence servers drop to two, the data being re-partitioned to ensure every cache entry has a primary and backup copy on different cache servers, then a third coherence server reappearing and then the data being re-partitioned again. Ctrl-C to exit the command. 
+to view the pod being restarted by the Kubernetes controller (ctrl C to exit). In many cases the restart will be very quick and you may see that the primary-cluster-storage-0 pod is already running but will show an AGE of a few seconds. The application's UI should show the number of coherence servers drop to two, the data being re-partitioned to ensure every cache entry has a primary and backup copy on different cache servers, then a third coherence server reappearing and then the data being re-partitioned again. Ctrl-C to exit the command. 
 
 ## Recovery from Node Failure
 
