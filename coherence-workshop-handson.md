@@ -238,7 +238,7 @@ helm repo update
 Install the operator into our Ashburn cluster:
 
 ```
-helm install coherence-operator --namespace coherence-demo-ns coherence/coherence-operator
+ helm install coherence-operator --namespace coherence-demo-ns --version=3.1.1 coherence/coherence-operator
 ```
 
 Check that the operator pod is running:
@@ -491,7 +491,7 @@ kubectl create namespace coherence-demo-ns
 Install the operator into our Phoenix cluster:
 
 ```
-helm install coherence-operator --namespace coherence-demo-ns coherence/coherence-operator
+ helm install coherence-operator --namespace coherence-demo-ns --version=3.1.1 coherence/coherence-operator
 ```
 
 Check that the operator pod is running:
