@@ -2,7 +2,7 @@
 
 ## Objective
 
-This lab will demonstrate the steps required to get Oracle Coherence up and running on Oracle Container Engine (OKE) using the Coherence Operator. It will then explore some of the advantages of running Coherence on Kubernetes on OCI. As an example Coherence application we will use the well known Coherence Demo available at  https://github.com/coherence-community/coherence-demo
+This lab will demonstrate the steps required to get Oracle Coherence up and running on Oracle Container Engine (OKE) using the Coherence Operator. It will then explore some of the advantages of running Coherence on Kubernetes on OCI. As an example Coherence application we will use the well known Coherence Demo available at https://github.com/coherence-community/coherence-demo
 
 ## Requirements
 
@@ -361,10 +361,10 @@ List the public IP addresses of the worker nodes:
 kubectl get nodes -o wide
 ```
 
-The output will list the addresses under EXTERNAL-IP column, copy any one and enter the URL changing EXTERNAL_IP for a proper address: 
+The output will list the addresses under EXTERNAL-IP column, copy any one, open a new browser tab and enter the URL changing EXTERNAL_IP for a proper address: 
 
 ```
-http://*<EXTERNAL-IP*>:32636/application/index.html 
+http://EXTERNAL-IP:32636/application/index.html 
 ```
 
 This will open the UI.
@@ -454,11 +454,15 @@ We will now remove a worker node from the Kubernetes cluster and observe how Kub
 
 ![Screenshot from 2020-09-29 16-16-16](Screenshot%20from%202020-09-29%2016-16-16-1601451821972.png)
 
-Click Node Pools to view the single node pool:
+Click Node Pools to view the list of node pools. 
 
-![Screenshot from 2020-09-29 16-22-47](Screenshot%20from%202020-09-29%2016-22-47-1601451877786.png)
+![image-20210329150753208](image-20210329150753208.png)
 
-Select Scale and on the resulting screen change 3 nodes to 2 and press the blue Scale button. The last worker node to be added will be removed. Monitor the state of the application via the application's UI and also by running:
+You will have a single node pool which will be named "coherence_userNN-np-1" (where NN is your student number). Click on the node pool name to see the node pool details:
+
+![image-20210329150915203](image-20210329150915203.png)
+
+Select the "Scale" button and on the resulting screen change number of nodes from 3 to 2 and press the blue Scale button. The last worker node to be added will be removed. Monitor the state of the application via the application's UI and also by running:
 
 ```
 kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
@@ -466,7 +470,7 @@ kubectl get po -n coherence-demo-ns -o wide -l coherenceRole=storage -w
 
 PLEASE Do NOT refresh the browser window to see node pool scaling progress as this will reset your cloud shell session environment variables.
 
-You should see that the number of pods is restored to 3 and the application rebalances the cache data as the number of cache servers drops and is then restored to the desired state. 
+You should see that the number of pods is restored to 3 and the application re-balances the cache data as the number of cache servers drops and is then restored to the desired state. 
 
 ## Cache Federation Across OCI Regions
 
