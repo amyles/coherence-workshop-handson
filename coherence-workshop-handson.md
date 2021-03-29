@@ -2,7 +2,7 @@
 
 ## Objective
 
-This lab will demonstrate the steps required to get Oracle Coherence up and running on Oracle Container Engine (OKE) using the Coherence Operator. It will then explore some of the advantages of running Coherence on Kubernetes on OCI. As an example Coherence application we will use the well known Coherence Demo available at https://github.com/coherence-community/coherence-demo
+This lab will demonstrate the steps required to get Oracle Coherence up and running on Oracle Container Engine (OKE) using the Coherence Operator. It will then explore some of the advantages of running Coherence on Kubernetes on OCI. As an example Coherence application we will use the well known Coherence Demo available at https://github.com/coherence-community/coherence-demo.
 
 ## Requirements
 
