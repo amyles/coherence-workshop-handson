@@ -118,7 +118,11 @@ The "Welcome to Grafana" panel will open:
 
 ![image-20210302145648441](image-20210302145648441.png)
 
-The default installation enables monitoring of the Kubernetes cluster itself and the OCI virtual machines that serve as the worker nodes. S et of dashboards are pre-installed to allow you to visualise the metrics that Prometheus is collecting. Take a moment to explore them either via the links in the bottom left pane or via the manage dashboards menu in the left hand side menu. 
+
+
+The default installation enables monitoring of the Kubernetes cluster itself and the OCI virtual machines that serve as the worker nodes. A set of dashboards is pre-installed to allow you to visualise the metrics that Prometheus is collecting from the Kubernetes cluster. Take a moment to explore them, either via the links in the bottom left pane or via the manage dashboards menu in the left hand side menu. 
+
+
 
 ![image-20210302151105109](image-20210302151105109.png)
 
@@ -137,13 +141,13 @@ We will now configure Prometheus and Grafana to display metrics from our Coheren
 A set of ready made Coherence dashboards are available for use with Grafana. Download then in your cloud shell environment:
 
 ```
-curl https://oracle.github.io/coherence-operator/dashboards/latest/coherence-dashboards.tar.gz -o coherence-dashboards.tar.gz
+curl https://oracle.github.io/coherence-operator/dashboards/latest/coherence-dashboards.tar.gz -o ~/coherence-dashboards.tar.gz
 ```
 
 And untar them with the following command:
 
 ```
-tar -zxvf coherence-dashboards.tar.gz
+tar -zxvf ~/coherence-dashboards.tar.gz
 ```
 
 Then:
