@@ -69,7 +69,7 @@ helm repo update
 And install the prometheus grafana stack into our cluster:
 
 ```
-helm install prometheus-stack prometheus-community/kube-prometheus-stack -n coherence-demo-ns
+helm install prometheus-stack prometheus-community/kube-prometheus-stack -n coherence-demo-ns --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
 ```
 
 Check the stack is running OK:
@@ -146,21 +146,10 @@ And untar them with the following command:
 tar -zxvf coherence-dashboards.tar.gz
 ```
 
-As we have already have a working set of dashboards pulling metrics from a Prometheus endpoint we'll modify the new Coherence dashboards to work with a new Prometheus endpoint we'll create in the next step. Modify the dashboard definitions with the following two commands. First:
+Then:
 
 ```
 cd ~/dashboards/grafana
-```
-
-and then:
-
-```
-for file in *.json
-do
-    sed -i '' -e 's/"datasource": "Prometheus"/"datasource": "Coherence-Prometheus"/g' \
-              -e 's/"datasource": null/"datasource": "Coherence-Prometheus"/g' \
-              -e 's/"datasource": "-- Grafana --"/"datasource": "Coherence-Prometheus"/g' $file;
-done
 ```
 
 Then install the dashboards as a configmap in with:
@@ -169,7 +158,7 @@ Then install the dashboards as a configmap in with:
 kubectl -n coherence-demo-ns create configmap coherence-grafana-dashboards --from-file=.
 ```
 
-Then label the dashboard configmap so that Grafana will register it:
+Then label the dashboard configmap so that Grafana will register it and display them:
 
 ```
 kubectl -n coherence-demo-ns label configmap coherence-grafana-dashboards grafana_dashboard=1
@@ -181,29 +170,70 @@ Swap back to  the Grafana UI and after a few moments you should see the new Cohe
 
 Further details on working with the Coherence Dashboards can be found here - https://oracle.github.io/coherence-operator/docs/latest/#/metrics/030_importing
 
-### Create a new Prometheus End Point
+### Redeploy the Coherence Cluster
 
-The Prometheus operator works like the Coherence operator via a set of custom resource definitions (CRDs). We will create a Prometheus CRD that will result in a new Prometheus endpoint that exposes the metrics from all the Coherence clusters in our OKE cluster. In cloud shell issue the following command:
+The Coherence operator's prometheus and grafana integration requires the Kubernetes cluster to be prepared with the Prometheus operator before creating a Coherence cluster. In the first workshop we already deployed our Coherence clusters so we will solve this chicken & egg issue by redeploying the Ashburn cluster. In reality a Kuberentes cluster will be prepared with all the required supporting utilities, like the monitoring stack, before an application is deployed.
+
+**Ensure that the environment variables are still valid, if cloud shell times out they will be lost.** The following command should return **two** IP addresses:
 
 ```
-cat <<EOF | kubectl apply -n coherence-demo-ns -f -
-apiVersion: monitoring.coreos.com/v1
-kind: Prometheus
-metadata:
-  name: prometheus
-spec:
-  serviceAccountName: prometheus-stack-kube-prom-prometheus
-  serviceMonitorSelector:
-    matchLabels:
-      coherenceComponent: coherence-service-monitor  
-  resources:
-    requests:
-      memory: 400Mi
-  enableAdminAPI: true
-EOF
+env | grep CLUSTER_HOST
+PRIMARY_CLUSTER_HOST=111.99.111.89
+SECONDARY_CLUSTER_HOST=111.66.111.44
 ```
 
-This will pull all the metrics from the prometheus service monitor components that are labelled with coherenceComponent = coherence-service-monitor. The service monitors for each Coherence cluster are created automatically by the Coherence operator for each cluster so long as metrics is enabled in the Coherence CRD.  
+If your cloud shell environment has timed out and reconnected the values may have been lost. To reinstate them issue the following commands:
+
+```
+kubectl config use-context phx
+
+export SECONDARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
+
+kubectl config use-context ash
+
+export PRIMARY_CLUSTER_HOST=$(kubectl get nodes -owide --no-headers=true | awk {'print $7'} | head -n1)
+```
+
+Ensure you are using the Ashburn kubectl context:
+
+```
+kubectl config use-context ash
+```
+
+List the helm releases:
+
+```
+helm ls -n coherence-demo-ns
+NAME                    NAMESPACE               REVISION        UPDATED                                 STATUS          CHART                              APP VERSION
+coherence-operator      coherence-demo-ns       1               2021-07-23 09:53:30.425040872 +0000 UTC deployed        coherence-operator-3.1.1           3.1.1      
+primary-cluster         coherence-demo-ns       1               2021-07-28 16:32:54.634008235 +0000 UTC deployed        primary-cluster-chart-0.1.0        1.16.0     
+prometheus-stack        coherence-demo-ns       1               2021-07-28 16:25:50.484065941 +0000 UTC deployed        kube-prometheus-stack-17.0.2       0.49.0     
+```
+
+Delete the primary-cluster release:
+
+```
+helm delete primary-cluster -n coherence-demo-ns
+release "primary-cluster" uninstalled
+```
+
+Wait a few moments for the NodePorts to be released and then, redeploy the Coherence application:
+
+```
+cd ~/coherence-demo
+```
+
+then
+
+```
+helm install primary-cluster --set primaryclusterhost=$PRIMARY_CLUSTER_HOST --set secondaryclusterhost=$SECONDARY_CLUSTER_HOST --set replicas=2 ./primary-cluster-chart/ -n coherence-demo-ns
+```
+
+
+
+### Check ServiceMonitors
+
+The service monitors for each Coherence cluster are created automatically by the Coherence operator for each cluster so long as metrics are enabled in the Coherence CRD and the Kubernetes cluster is prepared with the Prometheus operator **before** the Coherence cluster is created.  
 
 Check this is so in the cluster we have in Ashburn by describing the two Coherence CRDs we have:
 
@@ -231,54 +261,17 @@ You can also see the service monitors created as a result:
 kubectl get servicemonitor -n coherence-demo-ns -l coherenceComponent=coherence-service-monitor
 ```
 
-You should see two service monitors both labelled with coherenceComponent=coherence-service-monitor as we have two Coherence CRDs representing the http and storage roles in our cluster. This label is used in the serviceMonitorSelector of the Prometheus CRD.
-
-The Prometheus operator will create a Stateful Set for the prometheus CRD and also a service to allow other components, like Grafana, to access the metrics. 
-
-```
-kubectl get statefulset prometheus-prometheus -n coherence-demo-ns
-```
-
-And the service we will use in the Grafana data source we will create in the next step:
-
-```
-kubectl get svc prometheus-operated -n coherence-demo-ns
-NAME                  TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
-prometheus-operated   ClusterIP   None         <none>        9090/TCP   4d17h
-```
+You should see two service monitors both labelled with coherenceComponent=coherence-service-monitor as we have two Coherence CRDs representing the http and storage roles in our cluster. Each service monitor tells Prometheus which pods to scrape for metrics. 
 
 Further details on how Coherence on Kubernetes publishes metrics can be found here - https://oracle.github.io/coherence-operator/docs/latest/#/metrics/020_metrics
 
 
 
-### Create a new Grafana Data Source
-
-A new Grafana data source will allow specific Coherence metrics to be pushed into the new dashboards created above in parallel to the Kubernetes metrics. In the UI go to the settings cog wheel in the left hand menu pane and select the Data Sources tab :
-
-![image-20210302161730374](image-20210302161730374.png) 
-
-
-
-Press the blue "Add data source" button:
-
-![image-20210302162318240](image-20210302162318240.png)
-
-Click the top pane which should be labelled "Prometheus" and enter the following information:
-
-- Name: Coherence-Prometheus
-- URL:   http://prometheus-operated:9090/
-
-Leave all other fields at their default. The screen should look like this:
-
-![image-20210302162656193](image-20210302162656193.png)
-
-Scroll to the bottom of the screen and press "Save & Test". You should see confirmation that the data source is working OK. 
-
-
-
 ## Access the Coherence Dashboards
 
-The Coherence Dashboards should now be populated with metrics. 
+The Coherence Dashboards should now be populated with metrics. Select the Manage Dashboards screen and select the Coherence Dashboard Main, you should see it populated with data and be able to click through to other Coherence components such as machines and cluster members. 
+
+![image-20210729094238152](image-20210729094238152.png)
 
 The dashboards are described here - https://oracle.github.io/coherence-operator/docs/latest/#/metrics/040_dashboards
 
