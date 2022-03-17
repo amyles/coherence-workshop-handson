@@ -30,11 +30,15 @@ On the next screen leave the defaults and press "Continue" again:
 
 This will reveal the OCI log in form:
 
-![img_0.png](.media/img_0.png)
+![Screenshot 2022-03-17_at_13.10.04](/Users/amyles/Documents/tech/coherence/coherence-workshop-handson/Screenshot 2022-03-17_at_13.10.04.png)
+
+
 
 Enter the username and password provided to you:
 
-![img_1.png](.media/img_1.png)
+![Screenshot 2022-03-17 at 13.10.43](/Users/amyles/Documents/tech/coherence/coherence-workshop-handson/Screenshot 2022-03-17 at 13.10.43.png)
+
+
 
 Press sign in.
 
