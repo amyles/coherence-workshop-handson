@@ -34,7 +34,7 @@ This will reveal the OCI log in form:
 
 Enter the username and password provided to you:
 
-
+![img](Screenshot 2022-03-17 at 13.10.43.png)
 
 Press sign in.
 
