@@ -30,11 +30,11 @@ On the next screen leave the defaults and press "Continue" again:
 
 This will reveal the OCI log in form:
 
-![img](Screenshot 2022-03-17_at_13.10.04.png)
+![img](Screenshot_2022-03-17_at_13.10.04.png)
 
 Enter the username and password provided to you:
 
-![img](Screenshot 2022-03-17 at 13.10.43.png)
+![img](Screenshot-2022-03-17-at-13.10.43.png)
 
 Press sign in.
 
